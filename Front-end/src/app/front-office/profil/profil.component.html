@@ -1,0 +1,56 @@
+<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="w-full max-w-[1200px] mx-auto py-10 px-6">
+  <!-- Avatar au centre -->
+  <div class="flex justify-center mb-12">
+    <div class="w-40 h-40 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+      <img *ngIf="previewUrl" [src]="previewUrl" alt="Avatar" class="w-full h-full object-cover" />
+    </div>
+  </div>
+
+  <!-- Colonnes du formulaire -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Colonne 1 -->
+    <div class="flex flex-col gap-6">
+      <input type="text" formControlName="last_name" placeholder="Nom" class="bg-blue-100 p-4 rounded w-full" />
+      <input type="text" formControlName="number_of_phone" placeholder="Téléphone" class="bg-blue-100 p-4 rounded w-full" />
+      <input type="number" formControlName="height" placeholder="Taille" class="bg-blue-100 p-4 rounded w-full" />
+      <input type="text" formControlName="disability_type" placeholder="Profession / situation" class="bg-blue-100 p-4 rounded w-full" />
+    </div>
+
+    <!-- Colonne 2 -->
+    <div class="flex flex-col gap-6">
+      <input type="text" formControlName="first_name" placeholder="Prénom" class="bg-blue-100 p-4 rounded w-full" />
+      <input type="number" formControlName="age" placeholder="Âge" class="bg-blue-100 p-4 rounded w-full" />
+      <input type="number" formControlName="size" placeholder="Pointure" class="bg-blue-100 p-4 rounded w-full" />
+<input 
+  type="file" 
+  (change)="onFileSelected($event)" 
+  accept="image/*"
+  class="bg-blue-100 p-4 rounded w-full"
+/>
+
+    </div>
+  </div>
+
+  <!-- Bouton Modifier ou Enregistrer -->
+  <div class="mt-12 flex justify-center">
+    <button *ngIf="!isEditing"
+            type="button"
+            (click)="toggleEdit()"
+            class="bg-yellow-400 text-white font-semibold py-3 px-10 rounded hover:bg-yellow-500">
+      Modifier
+    </button>
+
+    <button *ngIf="isEditing"
+            type="submit"
+            class="bg-blue-500 text-white font-semibold py-3 px-10 rounded hover:bg-blue-600">
+      Enregistrer
+    </button>
+  </div>
+
+  <!-- Déconnexion -->
+  <div class="mt-3 flex justify-center">
+    <button (click)="logout()" class="bg-red-400 text-white font-semibold py-3 px-10 rounded hover:underline">
+      Déconnexion
+    </button>
+  </div>
+</form>

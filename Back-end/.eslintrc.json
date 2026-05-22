@@ -1,0 +1,21 @@
+{
+  "env": {
+		"node": true,
+		"commonjs": true,
+		"jest": true
+	},
+  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+	"plugins": ["prettier", "jest"],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"project": "*/tsconfig.json",
+		"tsconfigRootDir": ".",
+		"ecmaVersion": 2022
+	},
+	"rules": {
+		"prettier/prettier": "error",
+		"no-console": "off"
+	},
+	"ignorePatterns": ["node_modules/**", "dist/**", "jest.config.ts", "*/**/*.spec.ts"]
+}
+// This ESLint configuration is set up for a Node.js project using TypeScript.

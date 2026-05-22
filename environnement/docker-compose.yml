@@ -1,0 +1,103 @@
+services:
+  mysql: 
+    image: mysql:latest
+    container_name: mysql-eco-fit
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - eco-fit-net  
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-eco-fit
+    depends_on:
+      - mysql
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${PHPMYADMIN_PORT}:80"
+    restart: always
+    networks:
+      - eco-fit-net
+
+  # backend:
+  #   build:
+  #     context: ../Back-end
+  #     dockerfile: Dockerfile
+  #     target: development  # Default
+  #   env_file:
+  #     - ../Back-end/.env.dev
+  #   # args:
+  #   #     NODE_ENV: dev
+  #   container_name: server-eco-fit
+  #   networks:
+  #     - eco-fit-net
+  #   expose:
+  #     - "5000"
+  #   ports:
+  #     - "${BACKEND_PORT:-5001}:5000"
+  #   depends_on:
+  #     - mysql
+
+  # app:
+  #   build:
+  #     context: ../Front-end
+  #     dockerfile: Dockerfile
+  #     target: development
+  #     args:
+  #       ANGULAR_PORT: ${ANGULAR_DEV_PORT:-4200}
+
+  #   env_file:
+  #     - ../Front-end/.env.dev
+  #   container_name: angular-app-eco-fit
+  #   ports:
+  #     - "${ANGULAR_DEV_PORT:-4200}:${ANGULAR_DEV_PORT:-4200}"
+  #   depends_on:
+  #     - backend
+  #   volumes:
+  #     - ../Front-end:/app
+  #   networks:
+  #     - eco-fit-net
+
+  # sonarqube:
+  #   depends_on:
+  #     - mysql
+  #   image: sonarqube:lts-community
+  #   container_name: sonarqube-eco-fit
+  #   ports:
+  #     - "${SONARQUBE_PORT}:9000"
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - SONARQUBE_JDBC_URL=${SONARQUBE_JDBC_URL}
+  #     - SONARQUBE_JDBC_USERNAME=${SONARQUBE_JDBC_USERNAME}
+  #     - SONARQUBE_JDBC_PASSWORD=${SONARQUBE_JDBC_PASSWORD}
+  #   volumes:
+  #     - sonarqube_data:/opt/sonarqube/data
+  #     - sonarqube_logs:/opt/sonarqube/logs
+  #     - sonarqube_extensions:/opt/sonarqube/extensions
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9000"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 10
+
+volumes:
+  mysql_data:
+  # sonarqube_data:
+  # sonarqube_logs:
+  # sonarqube_extensions:
+
+networks:
+  eco-fit-net:

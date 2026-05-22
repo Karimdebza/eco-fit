@@ -1,0 +1,13 @@
+.hero-slide {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.slide-content {
+  transition: all 0.6s ease 0.3s;
+}
+.fade-in {
+  animation: fadeIn 1s ease-in;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

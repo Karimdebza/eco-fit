@@ -1,0 +1,56 @@
+<header class="navbar">
+  <div class="logo flex items-center">
+  <a [routerLink]="['/']">
+    <img 
+      src="/images/home/logo.png" 
+      alt="Logo Eco-Fit" 
+      class="h-12 w-12 rounded-full object-cover border border-gray-300 shadow-sm"
+    />
+  </a>
+</div>
+
+  <nav class="menu">
+    <!-- <a [routerLink]="['/subscreption']">abonnement</a> -->
+    <a [routerLink]="['/event']">événement</a>
+    <a [routerLink]="['/categories']">Programme</a>
+    <!-- <a [routerLink]="['/partner']">Partenaire</a> -->
+    <a [routerLink]="['/about-us']">à propos</a>
+  </nav>
+
+  <div class="user-section">
+    <!-- Bouton Login si l'utilisateur n'est pas connecté -->
+    <button *ngIf="!isLoggedIn" [routerLink]="['/signin']" class="login-btn">
+      Login
+    </button>
+
+    <!-- Icône/photo de profil si connecté -->
+    <a
+      *ngIf="isLoggedIn"
+      [routerLink]="['/profil']"
+      class="profile-icon"
+      aria-label="Voir profil"
+    >
+      <img
+        *ngIf="userPicture"
+        [src]="userPicture"
+        alt="Photo de profil"
+        class="profile-avatar"
+      />
+      <svg
+        *ngIf="!userPicture"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        class="w-6 h-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    </a>
+  </div>
+</header>

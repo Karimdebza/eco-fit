@@ -1,0 +1,33 @@
+import { IImageMeal } from './IImageMeal';
+import { ILanguage } from './ILanguage';
+import { ILicense } from './ILicence';
+import { IWeightUnit } from './IWeightUnit';
+export interface IIngredient {
+  id: number;
+  uuid: string;
+  remote_id: string;
+  source_name: string;
+  source_url: string;
+  code: string;
+  name: string;
+  created: string;
+  last_update: string;
+  last_imported: string;
+  energy: number;
+  protein: string;
+  carbohydrates: string;
+  carbohydrates_sugar: string;
+  fat: string;
+  fat_saturated: string;
+  fiber: string;
+  sodium: string;
+  weight_units: IWeightUnit[];
+language: number;
+image: IImageMeal | null;
+license: number;
+  license_title: string;
+  license_object_url: string;
+  license_author: string;
+  license_author_url: string;
+  license_derivative_source_url: string;
+}

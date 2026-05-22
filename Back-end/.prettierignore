@@ -1,0 +1,8 @@
+# Ignore build
+dist
+
+# Ignore config files
+jest.config.ts
+tsconfig.json
+
+node_modules

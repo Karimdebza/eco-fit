@@ -1,0 +1,68 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="w-full max-w-5xl mx-auto">
+
+    <!-- Chargement -->
+    <div *ngIf="loading" class="text-center py-16">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-b-transparent"></div>
+      <p class="text-lg text-blue-900 mt-4">Chargement de l'aliment...</p>
+    </div>
+
+    <!-- Erreur -->
+    <div *ngIf="error" class="text-center py-12 text-red-600 text-lg font-semibold">
+      {{ error }}
+    </div>
+
+    <!-- Affichage de l'aliment -->
+    <div *ngIf="aliment && !loading" class="bg-white p-10 rounded-2xl shadow-xl mt-10 mb-10">
+        <a routerLink="/alimentation"
+class="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg shadow-md transition-all duration-200 text-sm font-medium mb-6">
+
+
+  ← Retour à la liste
+</a>
+      <!-- Titre -->
+      <h1 class="text-3xl font-bold text-blue-600 mb-6 text-center">
+        {{ aliment.name || 'Nom non disponible' }}
+      </h1>
+
+      <!-- Image -->
+      <div class="w-full h-64 bg-gray-100 rounded-xl overflow-hidden flex justify-center items-center mb-6">
+        <img *ngIf="aliment.image?.image; else noImage"
+             [src]="aliment.image.image"
+             [alt]="aliment.name"
+             class="w-full h-full object-cover object-center" />
+        <ng-template #noImage>
+          <div class="text-blue-800 text-center">
+            <div class="text-5xl mb-2">🍎</div>
+            <span class="text-sm">Pas d'image</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Description -->
+      <div class="text-slate-700 text-base mb-6 text-justify leading-relaxed" [innerHTML]="aliment.description || 'Pas de description disponible'"></div>
+
+      <!-- Infos nutritionnelles -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 text-sm">
+        <div *ngIf="aliment.energy" class="bg-blue-100 px-3 py-2 rounded-lg text-blue-700">
+          <span class="font-medium">Énergie:</span> {{ aliment.energy }} kcal
+        </div>
+        <div *ngIf="aliment.protein" class="bg-blue-100 px-3 py-2 rounded-lg text-blue-700">
+          <span class="font-medium">Protéines:</span> {{ aliment.protein }} g
+        </div>
+        <div *ngIf="aliment.carbohydrates" class="bg-blue-100 px-3 py-2 rounded-lg text-blue-700">
+          <span class="font-medium">Glucides:</span> {{ aliment.carbohydrates }} g
+        </div>
+        <div *ngIf="aliment.fat" class="bg-blue-100 px-3 py-2 rounded-lg text-blue-700">
+          <span class="font-medium">Lipides:</span> {{ aliment.fat }} g
+        </div>
+      </div>
+
+      <!-- Footer infos -->
+      <div class="flex flex-col sm:flex-row justify-between items-center text-sm text-slate-500 gap-2">
+        <span><strong>Source:</strong> {{ aliment.source_name || 'Inconnue' }}</span>
+        <span class="bg-gray-100 px-2 py-1 rounded text-blue-600 text-xs">ID: {{ aliment.id }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+
+services:
+  mysql:
+    environment:
+      - MYSQL_DATABASE=eco_fit_prod
+      - MYSQL_USER=prod_user
+      - MYSQL_PASSWORD=prod_password
+    volumes:
+      - mysql_prod_data:/var/lib/mysql  # Volume distinct pour prod
+  backend:
+    build:
+      target: production
+      context: ../Back-end
+      dockerfile: Dockerfile
+    # args:
+    #     NODE_ENV: production
+    env_file:
+      - ../Back-end/.env.production
+
+
+  app:
+    build:
+      context: ../Front-end
+      dockerfile: dockerfile
+      target: production
+      args:
+        ANGULAR_PORT: ${ANGULAR_PROD_PORT:-80}
+    env_file:
+      - ../Front-end/.env.production
+    ports:
+      - "${ANGULAR_PROD_PORT:-80}:${ANGULAR_PROD_PORT:-80}"
+    environment:
+      - NODE_ENV=production
+      
+  sonarqube:
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:mysql://mysql:3306/eco_fit_prod
+      - SONARQUBE_JDBC_USERNAME=prod_user
+      - SONARQUBE_JDBC_PASSWORD=prod_password
+  
+volumes:
+  mysql_prod_data:  # Ne pas réutiliser le volume dev

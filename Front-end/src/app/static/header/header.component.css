@@ -1,0 +1,58 @@
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background-color: #e8f0fb; /* Bleu très clair cohérent avec la palette */
+  border-bottom: 2px solid #a3c4f3; /* Bleu doux pour la bordure */
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar .menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px; /* plus régulier que margin */
+}
+
+.navbar .menu a {
+  text-decoration: none;
+  color: #1e3a8a; /* Bleu foncé pour le texte */
+  font-weight: 600;
+  font-size: 16px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .menu a:hover,
+.navbar .menu a:focus {
+  background-color: #4a90e2;
+  color: white;
+  outline: none;
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+}
+
+.login-btn {
+  background-color: #4a90e2;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-btn:hover,
+.login-btn:focus {
+  background-color: #357ABD;
+  box-shadow: 0 6px 14px rgba(53, 122, 189, 0.5);
+  outline: none;
+}

@@ -1,0 +1,28 @@
+<app-carousel [slides]="carouselImages"></app-carousel>l>
+
+<div class="intro-text">
+  <p>
+    Bienvenue chez <strong>Eco-Fit</strong>, votre partenaire santé et bien-être au quotidien. Notre application innovante vous accompagne dans votre parcours sportif en alliant performance et respect de l’environnement.
+  </p>
+  <p>
+    <strong>Eco-Fit</strong> vous offre des programmes personnalisés, adaptés à vos objectifs et votre rythme, tout en promouvant une approche éco-responsable : nous valorisons l’équilibre entre corps, esprit et planète.
+  </p>
+  <p>
+    Rejoignez une communauté engagée, découvrez des conseils experts, suivez vos progrès et atteignez vos objectifs fitness avec un impact positif. Avec Eco-Fit, bougez mieux, vivez mieux, et contribuez à un monde plus durable.
+  </p>
+</div>
+
+
+<div class="card-container">
+  <div 
+    class="card" 
+    *ngFor="let card of cardImages" 
+    (click)="navigateTo(card.route)"
+    tabindex="0"
+    role="button"
+    (keydown.enter)="navigateTo(card.route)"
+  >
+    <img [src]="card.image" [alt]="card.name" />
+    <h4>{{ card.name }}</h4>
+  </div>
+</div>

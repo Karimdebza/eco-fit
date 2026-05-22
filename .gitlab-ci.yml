@@ -1,0 +1,5 @@
+# .gitlab-ci.yml à la racine du repo
+
+include:
+  - local: 'Front-end/.gitlab-ci.yml'
+  - local: 'Back-end/.gitlab-ci.yml'

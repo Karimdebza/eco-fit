@@ -1,0 +1,136 @@
+<div class="px-4 max-w-7xl mx-auto py-6 bg-white">
+  <h1 class="text-3xl font-bold mb-8 text-center text-[#2563EB]">
+    Liste des Aliments
+  </h1>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isLoading" class="text-center py-8">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#2563EB]"></div>
+    <p class="text-lg text-[#1E3A8A] mt-4">Chargement des aliments...</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="mb-6 text-center text-[#1E3A8A]" *ngIf="!isLoading && totalCount > 0">
+    <p class="text-lg">
+      <span class="font-semibold text-[#2563EB]">{{ totalCount | number }}</span> aliments au total
+    </p>
+    <p class="text-sm">
+      Page {{ currentPage }} sur {{ totalPages | number }} ({{ aliments.length }} aliments affichés)
+    </p>
+  </div>
+
+  <!-- Aucun aliment -->
+  <div *ngIf="!isLoading && aliments.length === 0" class="text-center py-12">
+    <div class="text-6xl mb-4 text-[#2563EB]">🍽️</div>
+    <p class="text-xl text-[#1E3A8A]">Aucun aliment trouvé.</p>
+  </div>
+
+  <!-- Liste -->
+  <div class="space-y-6" *ngIf="!isLoading && aliments.length > 0">
+    <div *ngFor="let aliment of aliments; trackBy: trackByFn"
+     [routerLink]="['/alimentation', aliment.id]"
+         class="bg-white rounded-lg shadow-md overflow-hidden flex gap-6 p-6 items-center w-full
+                transform transition-all duration-300 ease-in-out
+                hover:scale-[1.02] hover:shadow-xl cursor-pointer
+                active:scale-[0.98] focus:outline-none focus:ring-4 focus:ring-[#93C5FD]">
+
+      <!-- Image -->
+      <div class="flex-shrink-0 w-48 h-32 bg-[#F3F4F6] rounded-lg flex items-center justify-center overflow-hidden">
+        <img *ngIf="aliment.image?.image; else noImage"
+             [src]="aliment.image.image"
+             [alt]="aliment.name || 'Aliment'"
+             class="w-full h-full object-cover"
+             loading="lazy" />
+        <ng-template #noImage>
+          <div class="text-[#1E3A8A] text-center">
+            <div class="text-3xl mb-2">🍎</div>
+            <span class="text-xs">Pas d'image</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Infos -->
+      <div class="flex flex-col flex-grow">
+        <h2 class="text-xl font-semibold mb-2 text-[#1E3A8A]">
+          {{ aliment.name || 'Nom non disponible' }}
+        </h2>
+
+        <div class="text-[#334155] mb-3 line-clamp-2"
+             [innerHTML]="aliment.description || 'Pas de description disponible'"></div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 text-sm">
+          <div *ngIf="aliment.energy" class="bg-[#93C5FD]/30 px-2 py-1 rounded text-[#2563EB]">
+            <span class="font-medium">Énergie:</span> {{ aliment.energy }} kcal
+          </div>
+          <div *ngIf="aliment.protein" class="bg-[#BFDBFE]/30 px-2 py-1 rounded text-[#2563EB]">
+            <span class="font-medium">Protéines:</span> {{ aliment.protein }}g
+          </div>
+          <div *ngIf="aliment.carbohydrates" class="bg-[#DBEAFE]/40 px-2 py-1 rounded text-[#2563EB]">
+            <span class="font-medium">Glucides:</span> {{ aliment.carbohydrates }}g
+          </div>
+          <div *ngIf="aliment.fat" class="bg-[#E0F2FE] px-2 py-1 rounded text-[#2563EB]">
+            <span class="font-medium">Lipides:</span> {{ aliment.fat }}g
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-sm text-[#64748B]">
+          <span><strong>Source:</strong> {{ aliment.source_name || 'Source inconnue' }}</span>
+          <span class="text-xs bg-[#F3F4F6] px-2 py-1 rounded text-[#2563EB]">ID: {{ aliment.id }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <nav class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4" *ngIf="!isLoading && totalPages > 1">
+    <div class="flex items-center gap-2">
+      <button (click)="previousPage()" [disabled]="currentPage === 1"
+              class="px-4 py-2 rounded-lg bg-white border border-[#CBD5E1]
+                     disabled:opacity-50 hover:bg-[#F3F4F6] text-[#2563EB]">
+        ⬅ Précédent
+      </button>
+
+      <button (click)="nextPage()" [disabled]="currentPage >= totalPages"
+              class="px-4 py-2 rounded-lg bg-white border border-[#CBD5E1]
+                     disabled:opacity-50 hover:bg-[#F3F4F6] text-[#2563EB]">
+        Suivant ➡
+      </button>
+    </div>
+
+    <div class="flex items-center gap-1">
+      <button *ngIf="getPageNumbers()[0] > 1"
+              (click)="goToPage(1)"
+              class="w-10 h-10 rounded-lg border border-[#CBD5E1] hover:bg-[#F3F4F6] text-[#2563EB]">
+        1
+      </button>
+
+      <span *ngIf="getPageNumbers()[0] > 2" class="px-2 text-[#2563EB]">...</span>
+
+      <button *ngFor="let page of getPageNumbers()"
+              (click)="goToPage(page)"
+              [ngClass]="{
+                'bg-[#2563EB] text-white border-[#2563EB]': page === currentPage,
+                'border-[#CBD5E1] text-[#2563EB] hover:bg-[#F3F4F6]': page !== currentPage
+              }"
+              class="w-10 h-10 rounded-lg border font-medium">
+        {{ page }}
+      </button>
+
+      <span *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages - 1"
+            class="px-2 text-[#2563EB]">...</span>
+
+      <button *ngIf="getPageNumbers()[getPageNumbers().length - 1] < totalPages"
+              (click)="goToPage(totalPages)"
+              class="w-10 h-10 rounded-lg border border-[#CBD5E1] hover:bg-[#F3F4F6] text-[#2563EB]">
+        {{ totalPages }}
+      </button>
+    </div>
+
+    <div class="flex items-center gap-2 text-sm text-[#2563EB]">
+      <span>Aller à la page:</span>
+      <input type="number" [value]="currentPage" (keyup.enter)="goToPage(+$any($event).target.value)"
+             min="1" [max]="totalPages"
+             class="w-20 px-2 py-1 border border-[#CBD5E1] rounded text-center focus:outline-none focus:ring-2 focus:ring-[#93C5FD]" />
+    </div>
+  </nav>
+</div>

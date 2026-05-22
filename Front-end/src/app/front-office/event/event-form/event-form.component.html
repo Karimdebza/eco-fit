@@ -1,0 +1,21 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="max-w-xl mx-auto bg-white p-6 shadow rounded-xl">
+  <h2 class="text-2xl font-bold mb-4 text-center">
+    {{ eventId ? 'Modifier un événement' : 'Créer un événement' }}
+  </h2>
+
+  <input formControlName="title" placeholder="Titre" class="w-full mb-2 p-2 border rounded" />
+  <textarea formControlName="description" placeholder="Description" class="w-full mb-2 p-2 border rounded"></textarea>
+  <input type="datetime-local" formControlName="date_of_event" class="w-full mb-2 p-2 border rounded" />
+  <input formControlName="place" placeholder="Lieu" class="w-full mb-2 p-2 border rounded" />
+  <input formControlName="themes" placeholder="Thèmes" class="w-full mb-2 p-2 border rounded" />
+  <input formControlName="image" placeholder="URL de l’image" class="w-full mb-2 p-2 border rounded" />
+  <input type="number" formControlName="nombre_of_participant" placeholder="Nombre de participants" class="w-full mb-2 p-2 border rounded" />
+  <input type="number" formControlName="rating" placeholder="Note (0-5)" min="0" max="5" class="w-full mb-4 p-2 border rounded" />
+
+  <div class="flex justify-center gap-4">
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      {{ eventId ? 'Modifier' : 'Créer' }}
+    </button>
+    <a routerLink="/event" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Annuler</a>
+  </div>
+</form>

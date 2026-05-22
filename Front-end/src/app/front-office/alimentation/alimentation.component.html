@@ -1,0 +1,65 @@
+<div class="px-4 max-w-7xl mx-auto py-6">
+  <h1 class="text-3xl font-bold mb-8 text-center">Liste des Aliments</h1>
+
+  <app-search-bar (searchEvent)="searchAliments($event)"></app-search-bar>
+
+  <div class="space-y-6 mt-6">
+    <div
+      *ngFor="let aliment of pagedAliments"
+      tabindex="0"
+      class="bg-white rounded-lg shadow-md overflow-hidden flex gap-6 p-6 items-center w-full
+             transform transition-transform duration-300 ease-in-out
+             hover:scale-[1.03] hover:shadow-xl cursor-pointer
+             active:scale-[0.97] focus:outline-none focus:ring-4 focus:ring-green-300"
+    >
+      <div
+        class="flex-shrink-0 w-48 h-32 bg-green-100 rounded-lg flex items-center justify-center overflow-hidden"
+      >
+        <img
+          *ngIf="aliment.image"
+          [src]="aliment.image"
+          alt="{{ aliment.name }}"
+          class="w-full h-full object-cover"
+        />
+        <span *ngIf="!aliment.image" class="text-gray-500 text-sm">
+          Pas d'image
+        </span>
+      </div>
+
+      <div class="flex flex-col flex-grow">
+        <h2 class="text-xl font-semibold mb-2">{{ aliment.name }}</h2>
+        <p class="text-gray-700">{{ aliment.description }}</p>
+      </div>
+    </div>
+  </div>
+  
+  <nav class="mt-10 flex justify-center space-x-3 select-none">
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 1"
+      class="px-5 py-2 rounded bg-gray-300 disabled:opacity-50 hover:bg-gray-400 transition"
+    >
+      Précédent
+    </button>
+
+    <button
+      *ngFor="let page of pages"
+      (click)="onPageClick(page)"
+      [class.bg-green-600]="page === currentPage"
+      [class.text-white]="page === currentPage"
+      [class.cursor-default]="page === '...'"
+      [disabled]="page === '...'"
+      class="px-5 py-2 rounded hover:bg-green-500 transition"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+      class="px-5 py-2 rounded bg-gray-300 disabled:opacity-50 hover:bg-gray-400 transition"
+    >
+      Suivant
+    </button>
+  </nav>
+</div>

@@ -1,0 +1,24 @@
+<div class="text-center my-4">
+  <a routerLink="/event/new" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Créer un événement</a>
+</div>
+
+<div *ngIf="events && events.length > 0; else noEvents">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
+    <div *ngFor="let event of events" class="bg-white p-4 rounded-xl shadow hover:shadow-md">
+      <a [routerLink]="['/event', event.id_event]">
+        <img *ngIf="event.image" [src]="event.image" class="w-full h-40 object-cover rounded mb-2" />
+        <h3 class="text-xl font-bold text-blue-600">{{ event.title }}</h3>
+        <p class="text-sm text-gray-500">{{ event.date_of_event | date:'short' }}</p>
+        <p class="text-sm">{{ event.place }}</p>
+      </a>
+      <div class="flex justify-between mt-3 text-sm">
+        <a [routerLink]="['/event/edit', event.id_event]" class="text-green-600 hover:underline">Modifier</a>
+        <button (click)="deleteEvent(event.id_event)" class="text-red-600 hover:underline">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noEvents>
+  <p class="text-center text-gray-500 mt-10">Aucun événement disponible pour le moment.</p>
+</ng-template>

@@ -1,0 +1,50 @@
+services:
+  mysql:
+    image: mysql:8.0  # Version fixe
+    container_name: mysql-test
+    environment:
+      MYSQL_ROOT_PASSWORD: root_test_pass  # Obligatoire
+      MYSQL_DATABASE: ecofit_test_tmp
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: testpass123
+    ports:
+      - "3309:3306"  # Changez le port (3307=dev, 3308=peut être utilisé)
+    volumes:
+      - mysql_test_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ../Back-end  # Chemin relatif corrigé
+      dockerfile: Dockerfile  # Nouveau fichier spécifique
+    environment:
+      NODE_ENV: test
+      DB_HOST: mysql-test
+      DB_PORT: 3306
+      DB_NAME: ecofit_test_tmp
+      DB_USER: test_user
+      DB_PASSWORD: testpass123
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: sh -c "npm install cross-env && npm run test"
+  
+  phpmyadmin-test:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma-test
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql-test  # Doit matcher le nom du service MySQL
+      PMA_PORT: 3306
+      PMA_USER: test_user  # User de test
+      PMA_PASSWORD: testpass123  # Password de test
+    ports:
+      - "8082:80"  
+
+volumes:
+  mysql_test_data:

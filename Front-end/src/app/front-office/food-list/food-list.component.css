@@ -1,0 +1,73 @@
+ /* Couleurs personnalisées selon la palette */
+        .bg-glacial-blue { background-color: #89CFF0; }
+        .bg-deep-blue { background-color: #4A90E2; }
+        .bg-bright-blue { background-color: #5AC8FA; }
+        .bg-frost-gray { background-color: #D6E3F3; }
+        .text-glacial-blue { color: #89CFF0; }
+        .text-deep-blue { color: #4A90E2; }
+        .text-bright-blue { color: #5AC8FA; }
+        .text-frost-gray { color: #D6E3F3; }
+        .border-glacial-blue { border-color: #89CFF0; }
+        .border-deep-blue { border-color: #4A90E2; }
+        .border-bright-blue { border-color: #5AC8FA; }
+        .border-frost-gray { border-color: #D6E3F3; }
+        
+        /* Styles pour les cartes alimentaires */
+        .food-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .food-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(74, 144, 226, 0.1), 0 10px 10px -5px rgba(74, 144, 226, 0.04);
+        }
+        .food-card:active {
+            transform: scale(0.98);
+        }
+        .food-card:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(90, 200, 250, 0.3);
+        }
+        
+        /* Animation de chargement */
+        .loading-spinner {
+            border-color: #4A90E2;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Styles pour les infos nutritionnelles */
+        .nutrition-energy { background-color: rgba(255, 165, 0, 0.1); }
+        .nutrition-protein { background-color: rgba(74, 144, 226, 0.1); }
+        .nutrition-carbs { background-color: rgba(137, 207, 240, 0.1); }
+        .nutrition-fat { background-color: rgba(255, 235, 59, 0.1); }
+        
+        /* Boutons de pagination */
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #D6E3F3;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Page active */
+        .page-active {
+            background-color: #4A90E2;
+            color: white;
+            border-color: #4A90E2;
+        }
+        
+        /* Input focus */
+        .page-input:focus {
+            outline: none;
+            border-color: #5AC8FA;
+            box-shadow: 0 0 0 2px rgba(90, 200, 250, 0.2);
+        }

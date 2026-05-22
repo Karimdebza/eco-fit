@@ -1,0 +1,110 @@
+stages:
+  - install
+  - lint
+  - test
+  - build
+  - sonar
+
+variables:
+  NODE_ENV: test
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+  GIT_DEPTH: 0
+
+before_script:
+  - |
+    echo "👉 CI sur branche : $CI_COMMIT_REF_NAME"
+    npm install -g @angular/cli
+
+
+# ⚙️ INSTALL
+install_frontend:
+  image: node:23
+  stage: install
+  script:
+    - cd Front-end
+    - npm ci
+  only:
+    - dev
+    - main
+
+# 🧼 LINT
+lint_frontend:
+  image: node:23
+  stage: lint
+  script:
+    - cd Front-end
+    - npm ci
+    - npm run lint
+  only:
+    - dev
+    - main
+
+# 🧪 TEST
+test_frontend:
+  image: node:22
+  stage: test
+  before_script:
+    - apt-get update
+    - apt-get install -y wget gnupg2
+    - wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - apt-get install -y ./google-chrome-stable_current_amd64.deb || apt --fix-broken install -y
+    - export CHROME_BIN=/usr/bin/google-chrome
+  script:
+    - cd Front-end
+    - npm ci
+    - npx ng test --no-watch --no-progress --browsers=ChromeHeadlessNoSandbox --code-coverage
+  only:
+    - dev
+    - main
+
+# 🛠️ BUILD
+build_frontend:
+  image: node:22
+  stage: build
+  script:
+    - cd Front-end
+    - npm install  # Installer les dépendances
+    - npm run build
+  only:
+    - dev
+    - main
+
+
+# 🔍 SONARQUBE
+sonarqube_analysis_frontend:
+  stage: sonar
+  image: node:18
+  services:
+    - name: sonarqube:9.9-community
+      alias: sonarqube
+  variables:
+    SONAR_HOST_URL: http://sonarqube:9000
+  before_script:
+    - apt-get update && apt-get install -y unzip curl jq
+    - curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+    - unzip sonar-scanner.zip -d $CI_PROJECT_DIR
+    - export PATH="$CI_PROJECT_DIR/sonar-scanner-5.0.1.3006-linux/bin:$PATH"
+    - echo "⏳ Attente que SonarQube soit UP..."
+    - |
+      MAX_WAIT=600
+      WAITED=0
+      until curl -s $SONAR_HOST_URL/api/system/health | jq -r '.status' | grep -q "UP" || [ $WAITED -ge $MAX_WAIT ]; do
+        echo "SonarQube n'est pas prêt, réessayer dans 10 secondes..."
+        sleep 10
+        WAITED=$((WAITED + 10))
+      done
+      if [ $WAITED -ge $MAX_WAIT ]; then
+        echo "Délai d'attente dépassé : SonarQube n'est pas UP."
+        exit 1
+      fi
+  script:
+    - cd Front-end
+    - sonar-scanner \
+        -Dsonar.projectKey=eco-fit-frontend \
+        -Dsonar.projectName="Eco-Fit Front-end" \
+        -Dsonar.sources=src \
+        -Dsonar.host.url=$SONAR_HOST_URL \
+        -Dsonar.login=$SONAR_TOKEN
+  only:
+    - dev
+    - main
