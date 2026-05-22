@@ -1,39 +1,115 @@
-<div class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md mt-10" *ngIf="event">
-  <h2 class="text-3xl font-bold mb-6 text-center">{{ event.title || 'Titre non défini' }}</h2>
+<div class="max-w-4xl mx-auto px-6 py-8">
+  <a routerLink="/event"
+     class="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-light transition-colors mb-6">
+    ← Retour aux événements
+  </a>
 
-  <div class="mb-6">
-    <img *ngIf="event.image" [src]="event.image" alt="Image de l'événement" class="w-full h-64 object-cover rounded" />
-    <p *ngIf="!event.image" class="italic text-gray-400 text-center">Aucune image disponible</p>
+  <!-- Loading -->
+  <div *ngIf="!event" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-surface-muted border-t-accent animate-spin"></div>
+    <p class="text-ink/50 text-sm">Chargement de l'événement...</p>
   </div>
 
-  <div class="space-y-3 text-gray-700 text-base">
-    <p><strong>Date :</strong> {{ event.date_of_event | date:'medium' }}</p>
-    <p><strong>Lieu :</strong> {{ event.place || 'Non précisé' }}</p>
-    <p><strong>Thème :</strong> {{ event.themes || 'Non précisé' }}</p>
-    <p><strong>Participants :</strong> {{ event.nombre_of_participant || 'Non précisé' }}</p>
-    <p><strong>Note :</strong> {{ event.rating || 'Non noté' }}</p>
-    <p><strong>Description :</strong> {{ event.description || 'Aucune description fournie' }}</p>
-  </div>
+  <!-- Contenu -->
+  <div *ngIf="event" class="space-y-6">
 
-  <div *ngIf="user">
-    <button
-      *ngIf="!user.id_adventure"
-      (click)="joinEvent()"
-      class="bg-blue-500 text-white px-4 py-2 mt-4 rounded hover:bg-blue-600 transition"
-    >
-      Rejoindre
-    </button>
+    <!-- Hero -->
+    <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+      <!-- Image -->
+      <div class="relative h-72 bg-surface-muted">
+        <img *ngIf="event.image" [src]="event.image" [alt]="event.title"
+             class="w-full h-full object-cover"/>
+        <div *ngIf="!event.image"
+             class="w-full h-full flex items-center justify-center">
+          <span class="text-7xl">🏅</span>
+        </div>
+        <!-- Badge thème -->
+        <span *ngIf="event.themes"
+              class="absolute top-4 left-4 px-3 py-1 rounded-full bg-primary/80 text-surface text-xs font-semibold backdrop-blur-sm">
+          {{ event.themes }}
+        </span>
+        <!-- Rating -->
+        <div class="absolute top-4 right-4 flex items-center gap-1 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <span *ngFor="let star of [1,2,3,4,5]"
+                [ngClass]="star <= event.rating ? 'text-energy' : 'text-white/30'"
+                class="text-sm">★</span>
+        </div>
+      </div>
 
-    <button
-      *ngIf="user.id_adventure === event.id_event"
-      (click)="leaveEvent()"
-      class="bg-red-500 text-white px-4 py-2 mt-4 rounded hover:bg-red-600 transition"
-    >
-      Quitter l'événement
-    </button>
+      <!-- Infos principales -->
+      <div class="p-8">
+        <h1 class="font-display text-3xl font-bold text-ink mb-4">{{ event.title }}</h1>
 
-    <p *ngIf="user.id_adventure && user.id_adventure !== event.id_event" class="text-red-600 mt-4">
-      Vous êtes déjà inscrit à un autre événement.
-    </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="flex items-center gap-3 bg-surface-muted rounded-xl p-3">
+            <span class="text-xl">📍</span>
+            <div>
+              <p class="text-xs text-ink/40 font-semibold">Lieu</p>
+              <p class="text-sm font-medium text-ink">{{ event.place || 'Non précisé' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 bg-surface-muted rounded-xl p-3">
+            <span class="text-xl">🗓️</span>
+            <div>
+              <p class="text-xs text-ink/40 font-semibold">Date</p>
+              <p class="text-sm font-medium text-ink">{{ event.date_of_event | date:'dd MMM yyyy' }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 bg-surface-muted rounded-xl p-3">
+            <span class="text-xl">👥</span>
+            <div>
+              <p class="text-xs text-ink/40 font-semibold">Participants</p>
+              <p class="text-sm font-medium text-ink">{{ event.nombre_of_participant || 0 }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="text-ink/60 leading-relaxed mb-6">
+          {{ event.description || 'Aucune description fournie.' }}
+        </p>
+
+        <!-- Actions rejoindre/quitter -->
+        <div *ngIf="user" class="pt-4 border-t border-surface-muted">
+
+          <!-- Pas encore inscrit -->
+          <button *ngIf="!user.id_adventure"
+                  (click)="joinEvent()"
+                  class="px-6 py-3 rounded-xl bg-primary text-surface font-bold text-sm
+                         hover:bg-primary-light transition-colors duration-200">
+            ✅ Rejoindre cet événement
+          </button>
+
+          <!-- Inscrit à cet événement -->
+          <div *ngIf="user.id_adventure === event.id_event"
+               class="flex items-center gap-4">
+            <span class="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent text-sm font-semibold">
+              ✓ Vous participez à cet événement
+            </span>
+            <button (click)="leaveEvent()"
+                    class="px-4 py-2 rounded-xl border border-red-200 text-red-400 text-sm font-semibold
+                           hover:bg-red-50 transition-colors duration-200">
+              Quitter
+            </button>
+          </div>
+
+          <!-- Inscrit à un autre événement -->
+          <p *ngIf="user.id_adventure && user.id_adventure !== event.id_event"
+             class="flex items-center gap-2 text-ink/50 text-sm">
+            ⚠️ Vous êtes déjà inscrit à un autre événement.
+          </p>
+        </div>
+
+        <!-- Non connecté -->
+        <div *ngIf="!user" class="pt-4 border-t border-surface-muted">
+          <a routerLink="/signin"
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-surface font-bold text-sm
+                    hover:bg-primary-light transition-colors duration-200">
+            Connectez-vous pour participer
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
