@@ -1,55 +1,87 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CarouselComponent } from '../../shared/carousel/carousel.component';
 import { Router } from '@angular/router';
-
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CarouselComponent,CommonModule],
+  imports: [CarouselComponent, CommonModule, RouterLink],
   templateUrl: './home.component.html',
-  styleUrls:[ './home.component.css']
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-   carouselImages = [
-  {
-    title: "Transforme ton corps, respecte la planète",
-    description: "Avec Eco Fit, entraîne-toi efficacement tout en adoptant un mode de vie durable.",
-    buttonText: "En savoir plus",
-    buttonUrl: "/about-us",
-    image: "images/home/eco1.jpg"
-  },
-  {
-    title: "Programmes personnalisés & écoresponsables",
-    description: "Atteins tes objectifs grâce à nos plans d’entraînement intelligents et respectueux de l’environnement.",
-    buttonText: "En savoir plus",
-    buttonUrl: "/about-us",
-    image: "images/home/car2.jpg"
-  },
-  {
-    title: "Rejoins une communauté engagée",
-    description: "Partage tes progrès, motive les autres, et avance ensemble vers un futur plus sain.",
-    buttonText: "En savoir plus",
-    buttonUrl: "/about-us",
-    image: "images/home/car3.jpg"
-  }
-];
 
+  carouselImages = [
+    {
+      title: "Transforme ton corps, respecte la planète",
+      description: "Avec Eco-Fit, entraîne-toi efficacement tout en adoptant un mode de vie durable.",
+      buttonText: "Découvrir les programmes",
+      buttonUrl: "/categories",
+      image: "images/home/carousel1.jpg"
+    },
+    {
+      title: "Programmes personnalisés & écoresponsables",
+      description: "Atteins tes objectifs grâce à nos plans d'entraînement intelligents.",
+      buttonText: "Voir les exercices",
+      buttonUrl: "/exercises",
+      image: "images/home/car2.jpg"
+    },
+    {
+      title: "Rejoins une communauté engagée",
+      description: "Partage tes progrès, motive les autres, et avance vers un futur plus sain.",
+      buttonText: "Voir les événements",
+      buttonUrl: "/event",
+      image: "images/home/car3.jpg"
+    }
+  ];
 
-   cardImages = [
-    { name: 'Partenaire', image: 'images/home/partenaire.avif', route: '/partner' },
-    { name: 'Event', image: 'images/home/event.avif', route: '/event' },
-    { name: 'Abonnement', image: 'images/home/abonnement.avif', route: '/subscreption' },
-    { name: 'Programme', image: 'images/home/programe.jpg', route: '/categories' }
+  features = [
+    {
+      icon: '🏋️',
+      title: 'Exercices',
+      description: 'Des milliers d\'exercices guidés adaptés à ton niveau et tes objectifs.',
+      route: '/exercises',
+      image: 'images/home/exercice.avif',
+      cta: 'Explorer'
+    },
+    {
+      icon: '🥗',
+      title: 'Nutrition',
+      description: 'Suis ton alimentation et atteins tes objectifs caloriques au quotidien.',
+      route: '/alimentation',
+      image: 'images/home/alimentation.avif',
+      cta: 'Découvrir'
+    },
+    {
+      icon: '📅',
+      title: 'Événements',
+      description: 'Participe à des événements sportifs locaux et éco-responsables.',
+      route: '/event',
+      image: 'images/home/event.avif',
+      cta: 'Voir les événements'
+    },
+    {
+      icon: '🤝',
+      title: 'Partenaires',
+      description: 'Des partenaires engagés dans une démarche éco-responsable.',
+      route: '/partner',
+      image: 'images/home/partenaire.avif',
+      cta: 'Nos partenaires'
+    }
+  ];
+
+  stats = [
+    { value: '10K+', label: 'Membres actifs' },
+    { value: '500+', label: 'Exercices disponibles' },
+    { value: '50+', label: 'Événements par an' },
+    { value: '100%', label: 'Éco-responsable' },
   ];
 
   constructor(private router: Router) {}
-  onSearch(term: string) {
-    console.log('Search term:', term);
-  }
 
-    navigateTo(route: string) {
+  navigateTo(route: string) {
     this.router.navigateByUrl(route);
   }
 }

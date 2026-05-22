@@ -13,30 +13,23 @@ import { EventService } from '../../../services/event.service';
 })
 export class EventListComponent implements OnInit {
   events: IEvent[] = [];
+  isLoading = true;
 
   constructor(private eventService: EventService) {}
 
-  ngOnInit(): void {
-    this.loadEvents();
-  }
+  ngOnInit(): void { this.loadEvents(); }
 
   loadEvents(): void {
+    this.isLoading = true;
     this.eventService.getEvents().subscribe({
-      next: (events) => {
-        console.log('Événements reçus :', events);
-        this.events = events;
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des événements :', err);
-        this.events = [];
-      }
+      next: (events) => { this.events = events; this.isLoading = false; },
+      error: () => { this.events = []; this.isLoading = false; }
     });
   }
 
   deleteEvent(id: number): void {
     this.eventService.deleteEvent(id).subscribe({
-      next: () => this.loadEvents(),
-      error: (err) => console.error('Erreur suppression:', err)
+      next: () => this.loadEvents()
     });
   }
 }

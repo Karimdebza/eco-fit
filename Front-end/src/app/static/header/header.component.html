@@ -1,56 +1,118 @@
-<header class="navbar">
-  <div class="logo flex items-center">
-  <a [routerLink]="['/']">
-    <img 
-      src="/images/home/logo.png" 
-      alt="Logo Eco-Fit" 
-      class="h-12 w-12 rounded-full object-cover border border-gray-300 shadow-sm"
-    />
-  </a>
-</div>
+<header class="w-full sticky top-0 z-50 bg-primary shadow-card">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
 
-  <nav class="menu">
-    <!-- <a [routerLink]="['/subscreption']">abonnement</a> -->
-    <a [routerLink]="['/event']">événement</a>
-    <a [routerLink]="['/categories']">Programme</a>
-    <!-- <a [routerLink]="['/partner']">Partenaire</a> -->
-    <a [routerLink]="['/about-us']">à propos</a>
-  </nav>
-
-  <div class="user-section">
-    <!-- Bouton Login si l'utilisateur n'est pas connecté -->
-    <button *ngIf="!isLoggedIn" [routerLink]="['/signin']" class="login-btn">
-      Login
-    </button>
-
-    <!-- Icône/photo de profil si connecté -->
-    <a
-      *ngIf="isLoggedIn"
-      [routerLink]="['/profil']"
-      class="profile-icon"
-      aria-label="Voir profil"
-    >
+    <!-- Logo -->
+    <a routerLink="/" class="flex items-center gap-2 group">
       <img
-        *ngIf="userPicture"
-        [src]="userPicture"
-        alt="Photo de profil"
-        class="profile-avatar"
+        src="/images/home/logo.png"
+        alt="Eco-Fit"
+        class="h-10 w-10 rounded-full object-cover border-2 border-accent group-hover:border-energy transition-colors duration-200"
       />
-      <svg
-        *ngIf="!userPicture"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        class="w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
+      <span class="font-display text-xl font-bold text-surface tracking-wide hidden sm:block">
+        Eco<span class="text-accent">Fit</span>
+      </span>
     </a>
+
+    <!-- Nav desktop -->
+    <nav class="hidden md:flex items-center gap-1">
+      <a routerLink="/event" routerLinkActive="bg-accent/20 text-accent"
+         class="px-4 py-2 rounded-xl text-sm font-semibold text-surface/80 hover:text-surface hover:bg-white/10 transition-all duration-200">
+        Événements
+      </a>
+      <a routerLink="/categories" routerLinkActive="bg-accent/20 text-accent"
+         class="px-4 py-2 rounded-xl text-sm font-semibold text-surface/80 hover:text-surface hover:bg-white/10 transition-all duration-200">
+        Programmes
+      </a>
+      <a routerLink="/exercises" routerLinkActive="bg-accent/20 text-accent"
+         class="px-4 py-2 rounded-xl text-sm font-semibold text-surface/80 hover:text-surface hover:bg-white/10 transition-all duration-200">
+        Exercices
+      </a>
+      <a routerLink="/alimentation" routerLinkActive="bg-accent/20 text-accent"
+         class="px-4 py-2 rounded-xl text-sm font-semibold text-surface/80 hover:text-surface hover:bg-white/10 transition-all duration-200">
+        Nutrition
+      </a>
+      <a routerLink="/about-us" routerLinkActive="bg-accent/20 text-accent"
+         class="px-4 py-2 rounded-xl text-sm font-semibold text-surface/80 hover:text-surface hover:bg-white/10 transition-all duration-200">
+        À propos
+      </a>
+    </nav>
+
+    <!-- Actions desktop -->
+    <div class="hidden md:flex items-center gap-3">
+      <!-- Non connecté -->
+      <a *ngIf="!isLoggedIn" routerLink="/signin"
+         class="px-4 py-2 rounded-xl text-sm font-bold text-primary bg-surface hover:bg-accent hover:text-surface transition-all duration-200 shadow-sm">
+        Connexion
+      </a>
+      <a *ngIf="!isLoggedIn" routerLink="/signup"
+         class="px-4 py-2 rounded-xl text-sm font-bold text-surface bg-energy hover:bg-energy/90 transition-all duration-200 shadow-sm">
+        S'inscrire
+      </a>
+
+      <!-- Connecté -->
+      <a *ngIf="isLoggedIn" routerLink="/profil"
+         class="flex items-center gap-2 group">
+        <img *ngIf="userPicture" [src]="userPicture" alt="Profil"
+             class="h-9 w-9 rounded-full object-cover border-2 border-accent group-hover:border-energy transition-colors duration-200" />
+        <div *ngIf="!userPicture"
+             class="h-9 w-9 rounded-full bg-accent/20 border-2 border-accent flex items-center justify-center group-hover:border-energy transition-colors duration-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+      </a>
+    </div>
+
+    <!-- Burger mobile -->
+    <button (click)="toggleMobileMenu()"
+            class="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-xl hover:bg-white/10 transition-colors duration-200"
+            aria-label="Menu">
+      <span class="block w-5 h-0.5 bg-surface transition-all duration-300"
+            [class.rotate-45]="showMobileMenu" [class.translate-y-2]="showMobileMenu"></span>
+      <span class="block w-5 h-0.5 bg-surface transition-all duration-300"
+            [class.opacity-0]="showMobileMenu"></span>
+      <span class="block w-5 h-0.5 bg-surface transition-all duration-300"
+            [class.-rotate-45]="showMobileMenu" [class.-translate-y-2]="showMobileMenu"></span>
+    </button>
+  </div>
+
+  <!-- Menu mobile -->
+  <div *ngIf="showMobileMenu"
+       class="md:hidden bg-primary-dark border-t border-accent/20 px-4 py-4 flex flex-col gap-1">
+    <a routerLink="/event" routerLinkActive="text-accent" (click)="toggleMobileMenu()"
+       class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+      Événements
+    </a>
+    <a routerLink="/categories" routerLinkActive="text-accent" (click)="toggleMobileMenu()"
+       class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+      Programmes
+    </a>
+    <a routerLink="/exercises" routerLinkActive="text-accent" (click)="toggleMobileMenu()"
+       class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+      Exercices
+    </a>
+    <a routerLink="/alimentation" routerLinkActive="text-accent" (click)="toggleMobileMenu()"
+       class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+      Nutrition
+    </a>
+    <a routerLink="/about-us" routerLinkActive="text-accent" (click)="toggleMobileMenu()"
+       class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+      À propos
+    </a>
+    <div class="border-t border-accent/20 mt-2 pt-3 flex flex-col gap-2">
+      <a *ngIf="!isLoggedIn" routerLink="/signin" (click)="toggleMobileMenu()"
+         class="px-4 py-3 rounded-xl text-sm font-bold text-center text-primary bg-surface hover:bg-accent hover:text-surface transition-all">
+        Connexion
+      </a>
+      <a *ngIf="!isLoggedIn" routerLink="/signup" (click)="toggleMobileMenu()"
+         class="px-4 py-3 rounded-xl text-sm font-bold text-center text-surface bg-energy hover:bg-energy/90 transition-all">
+        S'inscrire
+      </a>
+      <a *ngIf="isLoggedIn" routerLink="/profil" (click)="toggleMobileMenu()"
+         class="px-4 py-3 rounded-xl text-sm font-semibold text-surface/80 hover:bg-white/10 hover:text-surface transition-all">
+        Mon profil
+      </a>
+    </div>
   </div>
 </header>

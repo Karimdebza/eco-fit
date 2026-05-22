@@ -41,7 +41,9 @@ export class UserService extends BaseService<typeof db.User> {
   async updatePassword(id_user: number, newPassword: string) {
     const user = await this.findById(id_user)
     if (!user) throw new Error('Utilisateur non trouvé')
-    return user.update({ password: newPassword })
+    // Fix: password must always be hashed before storage
+    const hashed = await bcrypt.hash(newPassword, 10)
+    return user.update({ password: hashed })
   }
 
   async updateProfilePicture(id_user: number, pictureUrl: string) {

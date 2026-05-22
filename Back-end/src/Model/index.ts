@@ -9,6 +9,7 @@ import PartnerModel from './Partener'
 import ExerciseModel from './Exercise'
 import ProgramModel from './program'
 import ProgrammeExercise from './ProgrammeExerciseModel'
+import NutritionEntryModel from './NutritionEntry'
 
 const models: any = {};
 
@@ -20,7 +21,7 @@ models.Partner = PartnerModel(sequelize, DataTypes);
 models.Exercise = ExerciseModel(sequelize, DataTypes);
 models.Programme = ProgramModel(sequelize, DataTypes);
 models.ProgrammeExercise = ProgrammeExercise(sequelize, DataTypes);
-
+models.NutritionEntry = NutritionEntryModel(sequelize, DataTypes);
 // Initialize associations
 Object.values(models).forEach((model: any) => {
   if (model.associate) {

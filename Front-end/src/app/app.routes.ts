@@ -16,7 +16,7 @@ import { EventDetailComponent } from './front-office/event/event-detail/event-de
 import { AuthGuard } from './guards/auth.guard';
 import { EventListComponent } from './front-office/event/event-list/event-list.component';
 import { EventFormComponent } from './front-office/event/event-form/event-form.component';
-
+import { TrackerComponent } from './front-office/tracker/tracker.component';
 
 export const routes: Routes = [
   {
@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'profil', component: ProfilComponent , }, // page de profil
       { path: 'signup', component: SignupComponent },
       { path: 'signin', component: SigninComponent },
+      { path: 'tracker', component: TrackerComponent, canActivate: [AuthGuard] },
       { path: 'exercises', component: ExerciseComponent,  }, // page des exercices
       { path: 'exercise/:id', component: ExerciseDetailComponent,  }, // page de détail d'un exercice
       { path: 'alimentation', component: FoodListComponent,  }, // page de liste des aliments

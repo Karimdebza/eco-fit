@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-search-bar',
@@ -11,10 +10,19 @@ import {Output, EventEmitter } from '@angular/core';
   styleUrls: ['./search-bar.component.css']
 })
 export class SearchBarComponent {
-  searchTerm = '';
+  @Input() placeholder = 'Rechercher...';
   @Output() searchEvent = new EventEmitter<string>();
 
+  searchTerm = '';
+
   onSearch() {
-    this.searchEvent.emit(this.searchTerm);
+    this.searchEvent.emit(this.searchTerm.trim());
+  }
+
+  // Reset si l'utilisateur vide le champ
+  onInputChange() {
+    if (this.searchTerm.trim() === '') {
+      this.searchEvent.emit('');
+    }
   }
 }

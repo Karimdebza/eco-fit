@@ -1,24 +1,95 @@
-<div class="text-center my-4">
-  <a routerLink="/event/new" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Créer un événement</a>
+<!-- Header page -->
+<div class="bg-surface-muted border-b border-surface-muted">
+  <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-3xl">📅</span>
+        <h1 class="font-display text-3xl font-bold text-ink">Événements</h1>
+      </div>
+      <p class="text-ink/50 text-sm">Rejoins des événements sportifs éco-responsables près de chez toi.</p>
+    </div>
+    <a routerLink="/event/new"
+       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-surface text-sm font-bold
+              hover:bg-primary-light transition-colors duration-200 shadow-sm">
+      + Créer un événement
+    </a>
+  </div>
 </div>
 
-<div *ngIf="events && events.length > 0; else noEvents">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
-    <div *ngFor="let event of events" class="bg-white p-4 rounded-xl shadow hover:shadow-md">
-      <a [routerLink]="['/event', event.id_event]">
-        <img *ngIf="event.image" [src]="event.image" class="w-full h-40 object-cover rounded mb-2" />
-        <h3 class="text-xl font-bold text-blue-600">{{ event.title }}</h3>
-        <p class="text-sm text-gray-500">{{ event.date_of_event | date:'short' }}</p>
-        <p class="text-sm">{{ event.place }}</p>
-      </a>
-      <div class="flex justify-between mt-3 text-sm">
-        <a [routerLink]="['/event/edit', event.id_event]" class="text-green-600 hover:underline">Modifier</a>
-        <button (click)="deleteEvent(event.id_event)" class="text-red-600 hover:underline">Supprimer</button>
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-surface-muted border-t-accent animate-spin"></div>
+    <p class="text-ink/50 text-sm">Chargement des événements...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && events.length === 0" class="text-center py-20">
+    <div class="text-6xl mb-4">🏃</div>
+    <p class="font-display text-xl font-bold text-ink mb-2">Aucun événement disponible</p>
+    <p class="text-ink/50 text-sm mb-6">Sois le premier à créer un événement éco-responsable !</p>
+    <a routerLink="/event/new"
+       class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-surface font-bold text-sm hover:bg-primary-light transition-colors">
+      Créer un événement
+    </a>
+  </div>
+
+  <!-- Grille événements -->
+  <div *ngIf="!isLoading && events.length > 0"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let event of events"
+         class="group bg-white rounded-2xl shadow-card hover:shadow-hover overflow-hidden transition-all duration-300 hover:-translate-y-1">
+
+      <!-- Image -->
+      <div class="relative h-48 bg-surface-muted overflow-hidden">
+        <img *ngIf="event.image" [src]="event.image" [alt]="event.title"
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+        <div *ngIf="!event.image"
+             class="w-full h-full flex items-center justify-center">
+          <span class="text-5xl">🏅</span>
+        </div>
+        <!-- Badge thème -->
+        <span *ngIf="event.themes"
+              class="absolute top-3 left-3 px-3 py-1 rounded-full bg-primary/80 text-surface text-xs font-semibold backdrop-blur-sm">
+          {{ event.themes }}
+        </span>
+      </div>
+
+      <!-- Contenu -->
+      <div class="p-5">
+        <a [routerLink]="['/event', event.id_event]">
+          <h3 class="font-display font-bold text-ink text-lg mb-2 group-hover:text-primary transition-colors">
+            {{ event.title }}
+          </h3>
+        </a>
+
+        <div class="space-y-1.5 mb-4">
+          <p class="flex items-center gap-2 text-ink/60 text-sm">
+            <span>📍</span> {{ event.place }}
+          </p>
+          <p class="flex items-center gap-2 text-ink/60 text-sm">
+            <span>🗓️</span> {{ event.date_of_event | date:'dd MMM yyyy' }}
+          </p>
+          <p *ngIf="event.nombre_of_participant" class="flex items-center gap-2 text-ink/60 text-sm">
+            <span>👥</span> {{ event.nombre_of_participant }} participants
+          </p>
+        </div>
+
+        <!-- Rating + Actions -->
+        <div class="flex items-center justify-between pt-3 border-t border-surface-muted">
+          <div class="flex items-center gap-1">
+            <span *ngFor="let star of [1,2,3,4,5]" class="text-sm"
+                  [ngClass]="star <= event.rating ? 'text-energy' : 'text-ink/20'">★</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <a [routerLink]="['/event/edit', event.id_event]"
+               class="text-accent text-xs font-semibold hover:underline">Modifier</a>
+            <button (click)="deleteEvent(event.id_event)"
+                    class="text-red-400 text-xs font-semibold hover:underline">Supprimer</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
-
-<ng-template #noEvents>
-  <p class="text-center text-gray-500 mt-10">Aucun événement disponible pour le moment.</p>
-</ng-template>

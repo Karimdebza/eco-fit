@@ -1,0 +1,497 @@
+--- eco-fit-backup/Front-end/src/app/models/IFormUser.ts	2026-05-22 08:28:12.061523021 +0000
++++ eco-fit/Front-end/src/app/models/IFormUser.ts	2026-05-22 08:28:16.267708621 +0000
+@@ -7,6 +7,6 @@
+   size:             number;
+   height:           number;
+   age:              number;
+-  picture:          string;
+-  disabilty_status: string;
+-}
+\ No newline at end of file
++  picture?:         string; // optionnel à l'inscription
++  disability_type:  string; // corrigé : était disabilty_status (faute de frappe)
++}
+--- eco-fit-backup/Front-end/src/app/front-office/signup/signup.component.ts	2026-05-22 08:28:12.059019641 +0000
++++ eco-fit/Front-end/src/app/front-office/signup/signup.component.ts	2026-05-22 08:28:27.950147898 +0000
+@@ -1,69 +1,77 @@
+-import { Component,OnInit } from '@angular/core';
+-import {  FormGroup, Validators, FormControl,NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+-import { Router } from '@angular/router';
++import { Component, OnInit } from '@angular/core';
++import { FormGroup, Validators, FormControl, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
++import { Router, RouterLink } from '@angular/router';
+ import { UserService } from '../../services/user.service';
+-
+ import { IUserSignup } from '../../models/IFormUser';
+ import { NgIf } from '@angular/common';
+ 
+-
+-
+ @Component({
+   selector: 'app-signup',
+   standalone: true,
+-  imports: [NgIf,ReactiveFormsModule],
++  imports: [NgIf, ReactiveFormsModule, RouterLink],
+   templateUrl: './signup.component.html',
+   styleUrl: './signup.component.css'
+ })
+ export class SignupComponent implements OnInit {
+ 
+-
+-    signupForm!: FormGroup<{
+-    last_name: FormControl<string>;
+-    first_name: FormControl<string>;
+-    email: FormControl<string>;
+-    password: FormControl<string>;
++  signupForm!: FormGroup<{
++    last_name:       FormControl<string>;
++    first_name:      FormControl<string>;
++    email:           FormControl<string>;
++    password:        FormControl<string>;
+     number_of_phone: FormControl<string>;
+-    size: FormControl<number>;
+-    height: FormControl<number>;
+-    age: FormControl<number>;
+-    picture: FormControl<string>;
+-    disabilty_status: FormControl<string>;
++    size:            FormControl<number>;
++    height:          FormControl<number>;
++    age:             FormControl<number>;
++    disability_type: FormControl<string>; // fix: était disabilty_status
+   }>;
+-    isSubmitting = false; 
+ 
+-  constructor(private fb: NonNullableFormBuilder, private userService: UserService, private router: Router) {
+-    
+-}
+- ngOnInit(): void {
+-    // NonNullableFormBuilder garantit que chaque contrôle est non-nullable
++  isSubmitting = false;
++  errorMessage = '';
++  successMessage = '';
++
++  constructor(
++    private fb: NonNullableFormBuilder,
++    private userService: UserService,
++    private router: Router
++  ) {}
++
++  ngOnInit(): void {
+     this.signupForm = this.fb.group({
+-      last_name:        ['', { validators: [Validators.required], nonNullable: true }],
+-      first_name:       ['', { validators: [Validators.required], nonNullable: true }],
+-      email:            ['', { validators: [Validators.required, Validators.email], nonNullable: true }],
+-      password:         ['', { validators: [Validators.required, Validators.minLength(8)], nonNullable: true }],
+-      number_of_phone:  ['', { validators: [Validators.required], nonNullable: true }],
+-      size:             [0,  { validators: [Validators.required], nonNullable: true }],
+-      height:           [0,  { validators: [Validators.required], nonNullable: true }],
+-      age:              [0,  { validators: [Validators.required], nonNullable: true }],
+-      picture:          ['', { validators: [Validators.required], nonNullable: true }],
+-      disabilty_status: ['', { validators: [Validators.required], nonNullable: true }],
++      last_name:       ['', [Validators.required]],
++      first_name:      ['', [Validators.required]],
++      email:           ['', [Validators.required, Validators.email]],
++      password:        ['', [Validators.required, Validators.minLength(8)]],
++      number_of_phone: ['', [Validators.required]],
++      size:            [0,  [Validators.required, Validators.min(1)]],
++      height:          [0,  [Validators.required, Validators.min(1)]],
++      age:             [0,  [Validators.required, Validators.min(1)]],
++      disability_type: ['', [Validators.required]],
+     });
+   }
+ 
+   onSubmit(): void {
+-  if (this.signupForm.valid) {
+-    const newUser: IUserSignup = this.signupForm.getRawValue();
+-    this.userService.signup(newUser).subscribe({
+-      next: data  => {
+-        console.log('Signup successful:', data);
+-        this.router.navigate(['/front-office']);
++    // Fix: isSubmitting ne se déclenche que si le form est valide
++    if (this.signupForm.invalid) {
++      this.signupForm.markAllAsTouched(); // force l'affichage des erreurs
++      return;
++    }
++
++    this.isSubmitting = true;
++    this.errorMessage = '';
++
++    const payload: IUserSignup = this.signupForm.getRawValue();
++
++    this.userService.signup(payload).subscribe({
++      next: () => {
++        this.successMessage = 'Compte créé ! Redirection...';
++        setTimeout(() => this.router.navigate(['/front-office/signin']), 1500);
+       },
+-      error: err => console.error('Signup error', err)
++      error: (err) => {
++        // Fix: feedback visible pour l'utilisateur
++        this.errorMessage = err.error?.message ?? 'Une erreur est survenue. Réessayez.';
++        this.isSubmitting = false;
++      }
+     });
+   }
+-   this.isSubmitting = true;
+-
+ }
+-
+-}
+\ No newline at end of file
+--- eco-fit-backup/Front-end/src/app/front-office/signup/signup.component.html	2026-05-22 08:28:12.058668773 +0000
++++ eco-fit/Front-end/src/app/front-office/signup/signup.component.html	2026-05-22 08:28:56.007710983 +0000
+@@ -1,201 +1,134 @@
+ <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+-  <div class="max-w-4xl w-full bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col lg:flex-row h-[600px]">
++  <div class="max-w-4xl w-full bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
+ 
+-    <!-- Colonne Logo (gauche) -->
+-    <div class="hidden lg:block lg:w-1/2 h-full">
+-      <img
+-        src="images/home/logo.png"
+-        alt="Logo"
+-        class="w-full h-full object-cover"
+-      />
++    <!-- Colonne Logo -->
++    <div class="hidden lg:block lg:w-1/2">
++      <img src="images/home/logo.png" alt="Logo Eco-Fit" class="w-full h-full object-cover" />
+     </div>
+ 
+-    <!-- Colonne Formulaire (droite) -->
++    <!-- Colonne Formulaire -->
+     <div class="w-full lg:w-1/2 p-8 flex flex-col items-center justify-center overflow-y-auto">
+ 
+-      <h2 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">
+-        Inscription
+-      </h2>
++      <h2 class="text-3xl font-extrabold text-gray-900 mb-2 text-center">Inscription</h2>
++      <p class="text-sm text-gray-500 mb-6 text-center">Rejoins la communauté Eco-Fit</p>
+ 
+-      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="w-full space-y-6 max-w-md" novalidate>
++      <!-- Message succès -->
++      <div *ngIf="successMessage" class="w-full max-w-md bg-green-50 border border-green-300 text-green-700 rounded-xl px-4 py-3 mb-4 text-sm">
++        {{ successMessage }}
++      </div>
++
++      <!-- Message erreur global -->
++      <div *ngIf="errorMessage" class="w-full max-w-md bg-red-50 border border-red-300 text-red-700 rounded-xl px-4 py-3 mb-4 text-sm">
++        {{ errorMessage }}
++      </div>
++
++      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="w-full space-y-4 max-w-md" novalidate>
+ 
+         <!-- Nom -->
+         <div>
+           <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
+-          <input
+-            id="last_name"
+-            formControlName="last_name"
+-            required
+-            placeholder="Votre nom"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.last_name.touched && signupForm.controls.last_name.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.last_name.errors?.['required']">Le nom est requis.</small>
+-          </div>
++          <input id="last_name" formControlName="last_name" placeholder="Votre nom"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.last_name.touched && signupForm.controls.last_name.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">Le nom est requis.</small>
+         </div>
+ 
+         <!-- Prénom -->
+         <div>
+           <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">Prénom *</label>
+-          <input
+-            id="first_name"
+-            formControlName="first_name"
+-            required
+-            placeholder="Votre prénom"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.first_name.touched && signupForm.controls.first_name.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.first_name.errors?.['required']">Le prénom est requis.</small>
+-          </div>
++          <input id="first_name" formControlName="first_name" placeholder="Votre prénom"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.first_name.touched && signupForm.controls.first_name.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">Le prénom est requis.</small>
+         </div>
+ 
+         <!-- Email -->
+         <div>
+           <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+-          <input
+-            id="email"
+-            type="email"
+-            formControlName="email"
+-            required
+-            placeholder="email@example.com"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.email.touched && signupForm.controls.email.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.email.errors?.['required']">L’email est requis.</small>
+-            <small *ngIf="signupForm.controls.email.errors?.['email']">Email invalide.</small>
+-          </div>
++          <input id="email" type="email" formControlName="email" placeholder="email@example.com"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.email.touched && signupForm.controls.email.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">L'email est requis.</small>
++          <small *ngIf="signupForm.controls.email.touched && signupForm.controls.email.errors?.['email']"
++            class="text-red-600 text-xs mt-1 block">Email invalide.</small>
+         </div>
+ 
+         <!-- Mot de passe -->
+         <div>
+           <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe *</label>
+-          <input
+-            id="password"
+-            type="password"
+-            formControlName="password"
+-            required
+-            placeholder="••••••••"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.password.touched && signupForm.controls.password.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.password.errors?.['required']">Le mot de passe est requis.</small>
+-            <small *ngIf="signupForm.controls.password.errors?.['minlength']">
+-              Minimum {{ signupForm.controls.password.errors?.['minlength'].requiredLength }} caractères.
+-            </small>
+-          </div>
++          <input id="password" type="password" formControlName="password" placeholder="Min. 8 caractères"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.password.touched && signupForm.controls.password.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">Le mot de passe est requis.</small>
++          <small *ngIf="signupForm.controls.password.touched && signupForm.controls.password.errors?.['minlength']"
++            class="text-red-600 text-xs mt-1 block">Minimum 8 caractères.</small>
+         </div>
+ 
+         <!-- Téléphone -->
+         <div>
+           <label for="number_of_phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone *</label>
+-          <input
+-            id="number_of_phone"
+-            formControlName="number_of_phone"
+-            required
+-            placeholder="06 12 34 56 78"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.number_of_phone.touched && signupForm.controls.number_of_phone.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.number_of_phone.errors?.['required']">Le numéro est requis.</small>
+-          </div>
+-        </div>
+-
+-        <!-- Taille -->
+-        <div>
+-          <label for="size" class="block text-sm font-medium text-gray-700 mb-1">Taille (cm) *</label>
+-          <input
+-            id="size"
+-            type="number"
+-            formControlName="size"
+-            required
+-            placeholder="ex: 175"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.size.touched && signupForm.controls.size.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.size.errors?.['required']">La taille est requise.</small>
+-          </div>
+-        </div>
+-
+-        <!-- Poids -->
+-        <div>
+-          <label for="height" class="block text-sm font-medium text-gray-700 mb-1">Poids (kg) *</label>
+-          <input
+-            id="height"
+-            type="number"
+-            formControlName="height"
+-            required
+-            placeholder="ex: 70"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.height.touched && signupForm.controls.height.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.height.errors?.['required']">Le poids est requis.</small>
++          <input id="number_of_phone" formControlName="number_of_phone" placeholder="06 12 34 56 78"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.number_of_phone.touched && signupForm.controls.number_of_phone.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">Le numéro est requis.</small>
++        </div>
++
++        <!-- Taille + Poids sur la même ligne -->
++        <div class="grid grid-cols-2 gap-4">
++          <div>
++            <label for="size" class="block text-sm font-medium text-gray-700 mb-1">Taille (cm) *</label>
++            <input id="size" type="number" formControlName="size" placeholder="175"
++              class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++            <small *ngIf="signupForm.controls.size.touched && signupForm.controls.size.errors?.['min']"
++              class="text-red-600 text-xs mt-1 block">Valeur invalide.</small>
++          </div>
++          <div>
++            <label for="height" class="block text-sm font-medium text-gray-700 mb-1">Poids (kg) *</label>
++            <input id="height" type="number" formControlName="height" placeholder="70"
++              class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++            <small *ngIf="signupForm.controls.height.touched && signupForm.controls.height.errors?.['min']"
++              class="text-red-600 text-xs mt-1 block">Valeur invalide.</small>
+           </div>
+         </div>
+ 
+         <!-- Âge -->
+         <div>
+           <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Âge *</label>
+-          <input
+-            id="age"
+-            type="number"
+-            formControlName="age"
+-            required
+-            placeholder="ex: 25"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.age.touched && signupForm.controls.age.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.age.errors?.['required']">L’âge est requis.</small>
+-          </div>
+-        </div>
+-
+-        <!-- URL Photo -->
+-        <div>
+-          <label for="picture" class="block text-sm font-medium text-gray-700 mb-1">URL de la photo *</label>
+-          <input
+-            id="picture"
+-            type="url"
+-            formControlName="picture"
+-            required
+-            placeholder="https://example.com/photo.jpg"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.picture.touched && signupForm.controls.picture.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.picture.errors?.['required']">L’URL est requise.</small>
+-            <small *ngIf="signupForm.controls.picture.errors?.['pattern']">URL invalide.</small>
+-          </div>
+-        </div>
+-
+-        <!-- Statut -->
+-        <div>
+-          <label for="disabilty_status" class="block text-sm font-medium text-gray-700 mb-1">Statut *</label>
+-          <input
+-            id="disabilty_status"
+-            formControlName="disabilty_status"
+-            required
+-            placeholder="Votre statut"
+-            class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-          />
+-          <div *ngIf="signupForm.controls.disabilty_status.touched && signupForm.controls.disabilty_status.invalid" class="text-red-600 text-sm mt-1">
+-            <small *ngIf="signupForm.controls.disabilty_status.errors?.['required']">Le statut est requis.</small>
+-          </div>
+-        </div>
+-
+-        <!-- Bouton soumettre -->
+-        <div>
+-          <button
+-            type="submit"
+-            [disabled]="signupForm.invalid || isSubmitting"
+-            class="group relative w-full flex justify-center py-3 px-6 border border-transparent text-lg font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+-          >
+-            S’inscrire
++          <input id="age" type="number" formControlName="age" placeholder="25"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
++          <small *ngIf="signupForm.controls.age.touched && signupForm.controls.age.errors?.['min']"
++            class="text-red-600 text-xs mt-1 block">Âge invalide.</small>
++        </div>
++
++        <!-- Statut handicap -->
++        <div>
++          <label for="disability_type" class="block text-sm font-medium text-gray-700 mb-1">Statut *</label>
++          <select id="disability_type" formControlName="disability_type"
++            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
++            <option value="" disabled>Sélectionner...</option>
++            <option value="none">Aucun handicap</option>
++            <option value="motor">Handicap moteur</option>
++            <option value="visual">Handicap visuel</option>
++            <option value="hearing">Handicap auditif</option>
++            <option value="other">Autre</option>
++          </select>
++          <small *ngIf="signupForm.controls.disability_type.touched && signupForm.controls.disability_type.errors?.['required']"
++            class="text-red-600 text-xs mt-1 block">Le statut est requis.</small>
++        </div>
++
++        <!-- Submit -->
++        <div class="pt-2">
++          <button type="submit" [disabled]="isSubmitting"
++            class="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
++            {{ isSubmitting ? 'Inscription en cours...' : "S'inscrire" }}
+           </button>
+         </div>
+ 
+       </form>
+ 
+       <p class="mt-6 text-center text-gray-600 text-sm">
+-        Vous avez déjà un compte ?
+-        <a routerLink="/signin" class="font-semibold text-blue-600 hover:text-blue-800">Connectez-vous</a>
++        Déjà un compte ?
++        <a routerLink="/front-office/signin" class="font-semibold text-blue-600 hover:text-blue-800">Se connecter</a>
+       </p>
+ 
+     </div>
+--- eco-fit-backup/Back-end/src/Service/UserService.ts	2026-05-22 08:28:11.938766544 +0000
++++ eco-fit/Back-end/src/Service/UserService.ts	2026-05-22 08:29:01.588361440 +0000
+@@ -41,7 +41,9 @@
+   async updatePassword(id_user: number, newPassword: string) {
+     const user = await this.findById(id_user)
+     if (!user) throw new Error('Utilisateur non trouvé')
+-    return user.update({ password: newPassword })
++    // Fix: password must always be hashed before storage
++    const hashed = await bcrypt.hash(newPassword, 10)
++    return user.update({ password: hashed })
+   }
+ 
+   async updateProfilePicture(id_user: number, pictureUrl: string) {
+--- eco-fit-backup/Back-end/src/Service/BaseService.ts	2026-05-22 08:28:11.937423443 +0000
++++ eco-fit/Back-end/src/Service/BaseService.ts	2026-05-22 08:29:11.016754019 +0000
+@@ -1,33 +1,41 @@
+ // src/services/BaseService.ts
+ import { Model, ModelStatic, WhereOptions } from 'sequelize';
+ 
++/**
++ * BaseService générique.
++ * 
++ * IMPORTANT : Sequelize ne connaît pas le nom de la PK à l'instanciation.
++ * Les sous-classes DOIVENT override findById si leur PK n'est pas 'id'.
++ * Ex: UserService override avec { id_user: id }, RoleService avec { id_role: id }.
++ * 
++ * findByPk() de Sequelize utilise la PK déclarée dans le model — c'est la méthode
++ * correcte à utiliser ici pour éviter ce problème.
++ */
+ export default class BaseService<T extends Model> {
+-  constructor(protected model: ModelStatic<T>) {
+-    this.model = model;
+-  }
++  constructor(protected model: ModelStatic<T>) {}
+ 
+   findAll(where?: WhereOptions) {
+     return this.model.findAll({ where });
+   }
+ 
++  // Utilise findByPk qui respecte la PK déclarée dans le model
+   findById(id: number) {
+-    // Assumes the primary key is 'id'; change as needed for your models
+-    return this.model.findOne({ where: { id } as WhereOptions });
++    return this.model.findByPk(id);
+   }
+ 
+-  create(data: Partial<T>) {
++  create(data: Partial<T['_creationAttributes']>) {
+     return this.model.create(data as any);
+   }
+ 
+-  async update(id: number, data: Partial<T>) {
++  async update(id: number, data: Partial<T['_creationAttributes']>) {
+     const item = await this.findById(id);
+     if (!item) throw new Error('NotFound');
+-    return await item.update(data as any);
++    return item.update(data as any);
+   }
+ 
+   async delete(id: number) {
+     const item = await this.findById(id);
+     if (!item) throw new Error('NotFound');
+-    return await item.destroy();
++    return item.destroy();
+   }
+ }

@@ -1,105 +1,91 @@
-import { Component,OnInit } from '@angular/core';
-import { IAliment } from '../../models/IAlimentation';
-import { AlimentationService } from '../../services/alimentation.service';
-
-
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { Router, RouterLink } from '@angular/router';
+import { IAliment } from '../../models/IAlimentation';
 import { IAlimentResponse } from '../../models/IAlimentResponse';
-import { RouterLink } from '@angular/router';
+import { AlimentationService } from '../../services/alimentation.service';
+import { SearchBarComponent } from '../../shared/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-food-list',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink, SearchBarComponent],
   templateUrl: './food-list.component.html',
   styleUrl: './food-list.component.css'
 })
 export class FoodListComponent implements OnInit {
-    aliments: IAliment[] = [];
+  aliments: IAliment[] = [];
   currentPage = 1;
-  pageSize = 20; 
+  pageSize = 20;
   totalCount = 0;
   totalPages = 0;
   isLoading = true;
-  nextUrl: string | null = null;
-  previousUrl: string | null = null;
 
-  constructor(private alimentService: AlimentationService) {}
+  constructor(
+    private alimentService: AlimentationService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    console.log('Composant initialisé, chargement des données...');
     this.loadPage(1);
   }
 
   loadPage(page: number) {
     this.isLoading = true;
     this.currentPage = page;
-
-    // Calculer l'offset pour l'API
     const offset = (page - 1) * this.pageSize;
-    
+
     this.alimentService.getAliments(this.pageSize, offset).subscribe({
       next: (response: IAlimentResponse) => {
-    
-        if (response && response.results && Array.isArray(response.results)) {
+        if (response?.results && Array.isArray(response.results)) {
           this.aliments = response.results;
           this.totalCount = response.count;
           this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-          this.nextUrl = response.next;
-          this.previousUrl = response.previous;
-          
-          console.log('✅ Données chargées avec succès:');
-    
         } else {
-          console.warn('❌ Format de réponse inattendu:', response);
           this.aliments = [];
         }
-        
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement:', err);
-        this.isLoading = false;
+      error: () => {
         this.aliments = [];
+        this.isLoading = false;
       }
     });
   }
 
-  previousPage() {
-    if (this.currentPage > 1) {
-      this.loadPage(this.currentPage - 1);
-    }
+  onSearch(term: string) {
+    if (!term) { this.loadPage(1); return; }
+    this.isLoading = true;
+    this.alimentService.getAliments(50, 0).subscribe({
+      next: (res) => {
+        const filtered = res.results.filter(a =>
+          a.name?.toLowerCase().includes(term.toLowerCase())
+        );
+        this.aliments = filtered;
+        this.totalCount = filtered.length;
+        this.totalPages = 1;
+        this.currentPage = 1;
+        this.isLoading = false;
+      },
+      error: () => { this.isLoading = false; }
+    });
   }
 
-  nextPage() {
-    if (this.currentPage < this.totalPages) {
-      this.loadPage(this.currentPage + 1);
-    }
+  previousPage() { if (this.currentPage > 1) this.loadPage(this.currentPage - 1); }
+  nextPage() { if (this.currentPage < this.totalPages) this.loadPage(this.currentPage + 1); }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) this.loadPage(page);
   }
 
-  // Pour les numéros de page
   getPageNumbers(): number[] {
-    const pages: number[] = [];
     const maxVisible = 5;
     const start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
     const end = Math.min(this.totalPages, start + maxVisible - 1);
-    
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    
-    return pages;
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.loadPage(page);
-    }
-  }
+  navigateTo(route: string) { this.router.navigateByUrl(route); }
 
-   trackByFn(index: number, item: IAliment): number {
-    return item.id;
-  }
-
+  trackByFn(_: number, item: IAliment): number { return item.id; }
 }

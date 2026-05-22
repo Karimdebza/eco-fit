@@ -56,11 +56,11 @@ export class AlimentationService {
     return this.http.delete<void>(`${environment.apiUrl}/aliments/${id}`);
   }
 
-  searchByName(name: string): Observable<IAliment[]> {
-    return this.http.get<IAliment[]>(
-      `${environment.apiUrl}/aliments/search/by-name?name=${encodeURIComponent(name)}`
-    );
-  }
+searchByName(name: string): Observable<IAlimentResponse> {
+  return this.http.get<IAlimentResponse>(
+    `${environment.apiUrl}/alimentation/?search=${encodeURIComponent(name)}&limit=10`
+  );
+}
 
   getFilteredAliments(params: any): Observable<IAliment[]> {
     return this.http.get<IAliment[]>(`${environment.apiUrl}/aliments/filter`, { params });

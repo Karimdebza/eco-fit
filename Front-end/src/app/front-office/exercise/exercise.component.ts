@@ -1,32 +1,29 @@
 import { Component, OnInit } from '@angular/core';
-import { IExercise } from '../../models/IExercise';
-import { ExerciseService } from '../../services/exercise.service';
 import { CommonModule } from '@angular/common';
-import { IExerciseResponse } from '../../models/IExerciseResponse';
 import { RouterLink } from '@angular/router';
+import { IExercise } from '../../models/IExercise';
+import { IExerciseResponse } from '../../models/IExerciseResponse';
+import { ExerciseService } from '../../services/exercise.service';
+import { SearchBarComponent } from '../../shared/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-exercise',
   standalone: true,
-  imports: [CommonModule,RouterLink],
+  imports: [CommonModule, RouterLink, SearchBarComponent],
   templateUrl: './exercise.component.html',
   styleUrl: './exercise.component.css'
 })
 export class ExerciseComponent implements OnInit {
-
   exercises: IExercise[] = [];
   currentPage = 1;
   pageSize = 10;
   totalCount = 0;
   totalPages = 0;
   isLoading = true;
-  nextUrl: string | null = null;
-  previousUrl: string | null = null;
 
   constructor(private exerciseService: ExerciseService) {}
 
   ngOnInit(): void {
-    console.log('Chargement des exercices...');
     this.loadPage(1);
   }
 
@@ -37,59 +34,43 @@ export class ExerciseComponent implements OnInit {
 
     this.exerciseService.getExercises(this.pageSize, offset).subscribe({
       next: (response: IExerciseResponse) => {
-        if (response && Array.isArray(response.results)) {
+        if (response?.results && Array.isArray(response.results)) {
           this.exercises = response.results;
           this.totalCount = response.count;
           this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-          this.nextUrl = response.next;
-          this.previousUrl = response.previous;
-          console.log('✅ Exercices chargés');
         } else {
-          console.warn('❌ Format inattendu', response);
           this.exercises = [];
         }
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error('Erreur chargement exercices:', err);
+      error: () => {
         this.exercises = [];
         this.isLoading = false;
-        
       }
     });
   }
 
-  previousPage(): void {
-    if (this.currentPage > 1) {
-      this.loadPage(this.currentPage - 1);
-    }
+  onSearch(term: string) {
+    // À implémenter si l'API exercice expose un endpoint search
+    if (!term) { this.loadPage(1); return; }
+    this.exercises = this.exercises.filter(e =>
+      e.name?.toLowerCase().includes(term.toLowerCase())
+    );
   }
 
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.loadPage(this.currentPage + 1);
-    }
+  previousPage(): void { if (this.currentPage > 1) this.loadPage(this.currentPage - 1); }
+  nextPage(): void { if (this.currentPage < this.totalPages) this.loadPage(this.currentPage + 1); }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) this.loadPage(page);
   }
 
   getPageNumbers(): number[] {
-    const pages: number[] = [];
     const maxVisible = 5;
     const start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
     const end = Math.min(this.totalPages, start + maxVisible - 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-      this.loadPage(page);
-    }
-  }
-
-  trackByFn(index: number, item: IExercise): number {
-    return item.id;
-  }
+  trackByFn(_: number, item: IExercise): number { return item.id; }
 }

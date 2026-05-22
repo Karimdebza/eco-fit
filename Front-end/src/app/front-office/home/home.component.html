@@ -1,28 +1,144 @@
-<app-carousel [slides]="carouselImages"></app-carousel>l>
+<!-- Carousel hero -->
+<app-carousel [slides]="carouselImages"></app-carousel>
 
-<div class="intro-text">
-  <p>
-    Bienvenue chez <strong>Eco-Fit</strong>, votre partenaire santé et bien-être au quotidien. Notre application innovante vous accompagne dans votre parcours sportif en alliant performance et respect de l’environnement.
-  </p>
-  <p>
-    <strong>Eco-Fit</strong> vous offre des programmes personnalisés, adaptés à vos objectifs et votre rythme, tout en promouvant une approche éco-responsable : nous valorisons l’équilibre entre corps, esprit et planète.
-  </p>
-  <p>
-    Rejoignez une communauté engagée, découvrez des conseils experts, suivez vos progrès et atteignez vos objectifs fitness avec un impact positif. Avec Eco-Fit, bougez mieux, vivez mieux, et contribuez à un monde plus durable.
-  </p>
-</div>
-
-
-<div class="card-container">
-  <div 
-    class="card" 
-    *ngFor="let card of cardImages" 
-    (click)="navigateTo(card.route)"
-    tabindex="0"
-    role="button"
-    (keydown.enter)="navigateTo(card.route)"
-  >
-    <img [src]="card.image" [alt]="card.name" />
-    <h4>{{ card.name }}</h4>
+<!-- Stats bar -->
+<div class="w-full bg-primary">
+  <div class="max-w-7xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div *ngFor="let stat of stats" class="flex flex-col items-center text-center">
+      <span class="font-display text-2xl md:text-3xl font-bold text-accent">{{ stat.value }}</span>
+      <span class="text-surface/60 text-sm mt-1">{{ stat.label }}</span>
+    </div>
   </div>
 </div>
+
+<!-- Section features -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+  <div class="text-center mb-12">
+    <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-3">
+      Tout ce dont tu as besoin
+    </span>
+    <h2 class="font-display text-3xl md:text-4xl font-bold text-ink">
+      Une plateforme complète pour ton bien-être
+    </h2>
+    <p class="text-ink/60 mt-3 max-w-xl mx-auto text-base">
+      Exercices, nutrition, événements, partenaires — tout est là pour t'accompagner au quotidien.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      *ngFor="let feature of features"
+      (click)="navigateTo(feature.route)"
+      (keydown.enter)="navigateTo(feature.route)"
+      tabindex="0"
+      role="button"
+      class="group bg-surface rounded-2xl overflow-hidden shadow-card hover:shadow-hover cursor-pointer transition-all duration-300 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-accent"
+    >
+      <!-- Image -->
+      <div class="relative h-44 overflow-hidden bg-surface-muted">
+        <img
+          [src]="feature.image"
+          [alt]="feature.title"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+        <span class="absolute top-3 left-3 text-2xl">{{ feature.icon }}</span>
+      </div>
+
+      <!-- Content -->
+      <div class="p-5">
+        <h3 class="font-display font-bold text-ink text-lg mb-1">{{ feature.title }}</h3>
+        <p class="text-ink/60 text-sm leading-relaxed mb-4">{{ feature.description }}</p>
+        <span class="inline-flex items-center gap-1 text-accent text-sm font-semibold group-hover:gap-2 transition-all duration-200">
+          {{ feature.cta }}
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section mission -->
+<section class="bg-surface-muted">
+  <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+    <!-- Texte -->
+    <div>
+      <span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+        Notre mission
+      </span>
+      <h2 class="font-display text-3xl md:text-4xl font-bold text-ink mb-4">
+        Bienvenue chez <span class="text-primary">Eco</span><span class="text-accent">Fit</span>
+      </h2>
+      <p class="text-ink/70 leading-relaxed mb-4">
+        Chez Eco-Fit, nous croyons que le <strong class="text-primary">bien-être personnel</strong> et le
+        <strong class="text-accent">respect de l'environnement</strong> peuvent évoluer main dans la main.
+      </p>
+      <p class="text-ink/70 leading-relaxed mb-6">
+        Notre plateforme connecte sportifs, coachs et partenaires écoresponsables pour créer un
+        écosystème dédié à la santé, la performance et la durabilité.
+      </p>
+      <ul class="space-y-2 mb-8">
+        <li *ngFor="let item of [
+          'Planifier et suivre vos entraînements',
+          'Participer à des événements sportifs locaux',
+          'Suivre vos progrès et performances',
+          'Recevoir des recommandations personnalisées'
+        ]" class="flex items-center gap-2 text-ink/70 text-sm">
+          <svg class="h-4 w-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ item }}
+        </li>
+      </ul>
+      <a routerLink="/about-us"
+         class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-surface font-semibold text-sm hover:bg-primary-light transition-colors duration-200">
+        En savoir plus
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Image -->
+    <div class="relative">
+      <img
+        src="images/home/programe.jpg"
+        alt="Eco-Fit communauté"
+        class="w-full h-80 object-cover rounded-2xl shadow-hover"
+      />
+      <div class="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-card p-4 flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center text-xl">🌱</div>
+        <div>
+          <p class="font-bold text-ink text-sm">100% Éco-responsable</p>
+          <p class="text-ink/50 text-xs">Engagé pour la planète</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="bg-primary">
+  <div class="max-w-3xl mx-auto px-6 py-16 text-center">
+    <h2 class="font-display text-3xl md:text-4xl font-bold text-surface mb-4">
+      Prêt à changer ta vie ?
+    </h2>
+    <p class="text-surface/60 mb-8 text-base">
+      Rejoins des milliers de membres qui allient performance sportive et respect de l'environnement.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a routerLink="/signup"
+         class="px-8 py-3 rounded-xl bg-energy text-surface font-bold text-sm hover:bg-energy/90 transition-colors duration-200 shadow-sm">
+        Créer mon compte gratuit
+      </a>
+      <a routerLink="/categories"
+         class="px-8 py-3 rounded-xl bg-white/10 text-surface font-semibold text-sm hover:bg-white/20 transition-colors duration-200 border border-surface/20">
+        Voir les programmes
+      </a>
+    </div>
+  </div>
+</section>

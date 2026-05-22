@@ -1,0 +1,347 @@
+<!-- Header page -->
+<div class="bg-surface-muted border-b border-surface-muted">
+  <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-2xl">🥗</span>
+        <h1 class="font-display text-2xl font-bold text-ink">Tracker Calorique</h1>
+      </div>
+      <p class="text-ink/50 text-sm">Données fournies par Open Food Facts 🌍</p>
+    </div>
+
+    <!-- Navigation date -->
+    <div class="flex items-center gap-2 bg-white rounded-2xl shadow-card px-4 py-2">
+      <button (click)="prevDay()"
+              class="w-8 h-8 rounded-xl hover:bg-surface-muted flex items-center justify-center transition-colors text-ink/60 hover:text-ink">
+        ←
+      </button>
+      <span class="font-semibold text-ink text-sm min-w-36 text-center capitalize">
+        {{ isToday() ? "Aujourd'hui" : formatDate(currentDate) }}
+      </span>
+      <button (click)="nextDay()" [disabled]="isToday()"
+              class="w-8 h-8 rounded-xl hover:bg-surface-muted flex items-center justify-center transition-colors text-ink/60 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed">
+        →
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-6 py-8 space-y-6">
+
+  <!-- Gauge + Macros + Recherche -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Gauge -->
+    <div class="bg-white rounded-2xl shadow-card p-6 flex flex-col items-center">
+      <p class="text-ink/50 text-xs font-semibold uppercase tracking-widest mb-4">Calories du jour</p>
+      <div class="relative">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle cx="70" cy="70" r="54" fill="none" stroke="#E9F0EB" stroke-width="12"/>
+          <circle cx="70" cy="70" r="54" fill="none"
+                  [attr.stroke]="gaugeColor" stroke-width="12" stroke-linecap="round"
+                  [attr.stroke-dasharray]="circumference"
+                  [attr.stroke-dashoffset]="strokeDashoffset"
+                  transform="rotate(-90 70 70)"
+                  style="transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease"/>
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="font-display text-2xl font-bold text-ink">{{ totals.calories }}</span>
+          <span class="text-ink/40 text-xs">/ {{ calorieGoal }} kcal</span>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center gap-2">
+        <ng-container *ngIf="!editingGoal">
+          <span class="text-ink/50 text-xs">Objectif : {{ calorieGoal }} kcal</span>
+          <button (click)="startEditGoal()" class="text-accent text-xs hover:underline">Modifier</button>
+        </ng-container>
+        <ng-container *ngIf="editingGoal">
+          <input type="number" [(ngModel)]="tempGoal" min="500" max="5000"
+                 class="w-20 text-xs border border-surface-muted rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-accent"/>
+          <button (click)="saveGoal()" class="text-accent text-xs font-semibold hover:underline">OK</button>
+        </ng-container>
+      </div>
+
+      <div class="mt-2 text-center">
+        <span class="text-xs font-semibold"
+              [ngClass]="{
+                'text-red-500': totals.calories > calorieGoal,
+                'text-accent':  totals.calories <= calorieGoal
+              }">
+          {{ totals.calories > calorieGoal
+              ? '+' + (totals.calories - calorieGoal) + ' kcal dépassé'
+              : (calorieGoal - totals.calories) + ' kcal restantes' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Macros -->
+    <div class="bg-white rounded-2xl shadow-card p-6 flex flex-col justify-between">
+      <p class="text-ink/50 text-xs font-semibold uppercase tracking-widest mb-4">Macronutriments</p>
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-ink/70 font-medium">💪 Protéines</span>
+            <span class="font-bold text-primary">{{ totals.protein }}g</span>
+          </div>
+          <div class="h-2 bg-surface-muted rounded-full overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500"
+                 [style.width.%]="Math.min((totals.protein / 150) * 100, 100)"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-ink/70 font-medium">🌾 Glucides</span>
+            <span class="font-bold text-accent">{{ totals.carbohydrates }}g</span>
+          </div>
+          <div class="h-2 bg-surface-muted rounded-full overflow-hidden">
+            <div class="h-full bg-accent rounded-full transition-all duration-500"
+                 [style.width.%]="Math.min((totals.carbohydrates / 250) * 100, 100)"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-ink/70 font-medium">🫒 Lipides</span>
+            <span class="font-bold text-energy">{{ totals.fat }}g</span>
+          </div>
+          <div class="h-2 bg-surface-muted rounded-full overflow-hidden">
+            <div class="h-full bg-energy rounded-full transition-all duration-500"
+                 [style.width.%]="Math.min((totals.fat / 70) * 100, 100)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-surface-muted grid grid-cols-3 gap-2 text-center">
+        <div>
+          <p class="text-xs text-ink/40">Prot.</p>
+          <p class="text-xs font-bold text-primary">{{ totals.protein * 4 | number:'1.0-0' }} kcal</p>
+        </div>
+        <div>
+          <p class="text-xs text-ink/40">Gluc.</p>
+          <p class="text-xs font-bold text-accent">{{ totals.carbohydrates * 4 | number:'1.0-0' }} kcal</p>
+        </div>
+        <div>
+          <p class="text-xs text-ink/40">Lip.</p>
+          <p class="text-xs font-bold text-energy">{{ totals.fat * 9 | number:'1.0-0' }} kcal</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recherche OFF -->
+    <div class="bg-white rounded-2xl shadow-card p-6">
+      <p class="text-ink/50 text-xs font-semibold uppercase tracking-widest mb-4">Ajouter un aliment</p>
+
+      <div class="relative">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink/30 pointer-events-none"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input [(ngModel)]="searchQuery" (input)="onSearchInput()" type="text"
+                 placeholder="Ex: banane, poulet, riz..."
+                 class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-surface-muted text-sm
+                        focus:outline-none focus:ring-2 focus:ring-accent transition-all"/>
+          <div *ngIf="isSearching"
+               class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin">
+          </div>
+        </div>
+
+        <!-- Dropdown résultats -->
+        <div *ngIf="showResults && searchResults.length > 0"
+             class="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-hover border border-surface-muted z-20 max-h-56 overflow-y-auto">
+          <button *ngFor="let food of searchResults" (click)="selectFood(food)"
+                  class="w-full text-left px-4 py-3 hover:bg-surface-muted transition-colors border-b border-surface-muted last:border-0 flex items-center gap-3">
+            <img *ngIf="food.image" [src]="food.image" [alt]="food.name"
+                 class="w-8 h-8 rounded-lg object-cover flex-shrink-0"/>
+            <div *ngIf="!food.image"
+                 class="w-8 h-8 rounded-lg bg-surface-muted flex items-center justify-center flex-shrink-0 text-sm">
+              🍽️
+            </div>
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-ink truncate">{{ food.name }}</p>
+              <p class="text-xs text-ink/40">
+                {{ food.energy }} kcal · {{ food.protein }}g prot · {{ food.carbohydrates }}g gluc
+              </p>
+            </div>
+          </button>
+        </div>
+
+        <!-- Aucun résultat -->
+        <div *ngIf="showResults && searchResults.length === 0 && !isSearching"
+             class="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-card border border-surface-muted z-20 px-4 py-3 text-sm text-ink/40 text-center">
+          Aucun résultat
+        </div>
+      </div>
+
+      <!-- Sélecteur repas -->
+      <div class="mt-4 grid grid-cols-2 gap-2">
+        <button *ngFor="let m of mealConfigs" (click)="selectedMeal = m.key"
+                class="px-3 py-2 rounded-xl text-xs font-semibold border transition-all"
+                [ngClass]="{
+                  'bg-primary border-primary text-surface': selectedMeal === m.key,
+                  'border-surface-muted text-ink/60 hover:bg-surface-muted': selectedMeal !== m.key
+                }">
+          {{ m.icon }} {{ m.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Journal par repas -->
+  <div class="bg-white rounded-2xl shadow-card p-6">
+    <div class="flex items-center justify-between mb-6">
+      <p class="font-display font-bold text-ink text-lg">Journal du jour</p>
+      <div *ngIf="isLoadingJournal"
+           class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngFor="let meal of mealConfigs" class="space-y-2">
+        <div class="flex items-center justify-between">
+          <h3 class="font-semibold text-ink text-sm">{{ meal.icon }} {{ meal.label }}</h3>
+          <span class="text-xs text-ink/40">{{ mealCalories(meal.key) }} kcal</span>
+        </div>
+
+        <div *ngIf="meals[meal.key].length === 0"
+             class="h-14 rounded-xl border-2 border-dashed border-surface-muted flex items-center justify-center">
+          <span class="text-ink/30 text-xs">Aucun aliment</span>
+        </div>
+
+        <div *ngFor="let entry of meals[meal.key]"
+             class="group flex items-center justify-between bg-surface-muted rounded-xl px-3 py-2.5">
+          <div class="flex-grow min-w-0">
+            <p class="text-sm font-medium text-ink truncate">{{ entry.ingredient_name }}</p>
+            <p class="text-xs text-ink/50">{{ entry.quantity_g }}g · {{ entry.calories }} kcal</p>
+          </div>
+          <button (click)="deleteEntry(entry.id)"
+                  class="ml-2 flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center
+                         text-ink/20 hover:text-red-400 hover:bg-red-50
+                         opacity-0 group-hover:opacity-100 transition-all duration-200">
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historique 7 jours -->
+  <div class="bg-white rounded-2xl shadow-card p-6">
+    <p class="font-display font-bold text-ink text-lg mb-6">Historique — 7 derniers jours</p>
+
+    <div *ngIf="history.length === 0" class="text-center py-8 text-ink/30 text-sm">
+      Pas encore de données
+    </div>
+
+    <div *ngIf="history.length > 0" class="flex items-end justify-around gap-2" style="height: 120px">
+      <div *ngFor="let h of history" class="flex flex-col items-center gap-1 flex-1">
+        <div class="relative w-full flex flex-col items-center justify-end" style="height: 96px">
+          <span class="text-xs font-bold text-ink/50 mb-1">{{ h.calories }}</span>
+          <div class="w-full max-w-10 rounded-t-lg transition-all duration-500"
+               [ngClass]="historyBarColor(h.calories)"
+               [style.height.%]="historyBarHeight(h.calories)">
+          </div>
+        </div>
+        <span class="text-xs text-ink/40 capitalize">{{ formatShortDate(h.date) }}</span>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center gap-2">
+      <div class="w-6 h-0.5 bg-energy border-dashed"></div>
+      <span class="text-xs text-ink/40">Objectif : {{ calorieGoal }} kcal</span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal"
+     class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center px-4"
+     (click)="closeModal()">
+  <div class="bg-white rounded-2xl shadow-hover w-full max-w-sm p-6"
+       (click)="$event.stopPropagation()">
+
+    <div class="flex items-start justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <img *ngIf="selectedFood?.image" [src]="selectedFood!.image" [alt]="selectedFood!.name"
+             class="w-12 h-12 rounded-xl object-cover"/>
+        <div *ngIf="!selectedFood?.image"
+             class="w-12 h-12 rounded-xl bg-surface-muted flex items-center justify-center text-2xl">
+          🍽️
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-ink">{{ selectedFood?.name }}</h3>
+          <p class="text-ink/40 text-xs">Valeurs pour 100g</p>
+        </div>
+      </div>
+      <button (click)="closeModal()" class="text-ink/30 hover:text-ink text-xl leading-none">✕</button>
+    </div>
+
+    <!-- Valeurs 100g -->
+    <div class="grid grid-cols-4 gap-2 mb-5">
+      <div class="text-center bg-surface-muted rounded-xl py-2">
+        <p class="text-xs text-ink/40">Kcal</p>
+        <p class="font-bold text-energy text-sm">{{ selectedFood?.energy }}</p>
+      </div>
+      <div class="text-center bg-surface-muted rounded-xl py-2">
+        <p class="text-xs text-ink/40">Prot.</p>
+        <p class="font-bold text-primary text-sm">{{ selectedFood?.protein }}g</p>
+      </div>
+      <div class="text-center bg-surface-muted rounded-xl py-2">
+        <p class="text-xs text-ink/40">Gluc.</p>
+        <p class="font-bold text-accent text-sm">{{ selectedFood?.carbohydrates }}g</p>
+      </div>
+      <div class="text-center bg-surface-muted rounded-xl py-2">
+        <p class="text-xs text-ink/40">Lip.</p>
+        <p class="font-bold text-ink/60 text-sm">{{ selectedFood?.fat }}g</p>
+      </div>
+    </div>
+
+    <!-- Quantité -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-ink mb-1.5">Quantité (g)</label>
+      <input type="number" [(ngModel)]="quantity" min="1" max="2000"
+             class="w-full px-4 py-2.5 rounded-xl border border-surface-muted text-sm
+                    focus:outline-none focus:ring-2 focus:ring-accent transition-all text-center font-bold text-lg"/>
+    </div>
+
+    <!-- Preview calculé -->
+    <div class="bg-primary/5 rounded-xl p-3 mb-4 grid grid-cols-4 gap-2 text-center">
+      <div>
+        <p class="text-xs text-ink/40">Kcal</p>
+        <p class="font-bold text-energy text-sm">{{ previewCalories }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-ink/40">Prot.</p>
+        <p class="font-bold text-primary text-sm">{{ previewProtein }}g</p>
+      </div>
+      <div>
+        <p class="text-xs text-ink/40">Gluc.</p>
+        <p class="font-bold text-accent text-sm">{{ previewCarbs }}g</p>
+      </div>
+      <div>
+        <p class="text-xs text-ink/40">Lip.</p>
+        <p class="font-bold text-ink/60 text-sm">{{ previewFat }}g</p>
+      </div>
+    </div>
+
+    <!-- Repas -->
+    <div class="mb-5">
+      <label class="block text-sm font-medium text-ink mb-1.5">Repas</label>
+      <div class="grid grid-cols-2 gap-2">
+        <button *ngFor="let m of mealConfigs" (click)="selectedMeal = m.key"
+                class="px-3 py-2 rounded-xl text-xs font-semibold border transition-all"
+                [ngClass]="{
+                  'bg-primary border-primary text-surface': selectedMeal === m.key,
+                  'border-surface-muted text-ink/60 hover:bg-surface-muted': selectedMeal !== m.key
+                }">
+          {{ m.icon }} {{ m.label }}
+        </button>
+      </div>
+    </div>
+
+    <button (click)="addToJournal()"
+            class="w-full py-3 rounded-xl bg-primary text-surface font-bold text-sm
+                   hover:bg-primary-light transition-colors duration-200">
+      Ajouter au journal
+    </button>
+  </div>
+</div>

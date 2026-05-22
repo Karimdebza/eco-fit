@@ -7,6 +7,6 @@ export interface IUserSignup {
   size:             number;
   height:           number;
   age:              number;
-  picture:          string;
-  disabilty_status: string;
+  picture?:         string; // optionnel à l'inscription
+  disability_type:  string; // corrigé : était disabilty_status (faute de frappe)
 }

@@ -7,7 +7,7 @@ import userRoutes from './User.route';
 import roleRoutes from './Role.route';
 import alimentationRoutes from './Alimentation.routes';
 import eventRoutes from './Event.route';
-
+import nutritionRoutes from './Nutrition.routes';
 const router = Router();
 
 router.use('/exercices', exerciceRoutes);
@@ -18,6 +18,6 @@ router.use('/users', userRoutes);
 router.use('/roles', roleRoutes);
 router.use('/alimentation',alimentationRoutes);
 router.use('/events', eventRoutes);
-
+router.use('/nutrition', nutritionRoutes);
 
 export default router;

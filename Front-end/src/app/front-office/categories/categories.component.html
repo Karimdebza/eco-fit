@@ -1,94 +1,121 @@
-<div class="max-w-5xl mx-auto px-6 py-12 space-y-16">
+<!-- Header page -->
+<div class="bg-surface-muted border-b border-surface-muted">
+  <div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-3xl">🏆</span>
+      <h1 class="font-display text-3xl font-bold text-ink">Programmes</h1>
+    </div>
+    <p class="text-ink/50 text-sm">Des programmes pensés pour performer et respecter la planète.</p>
+  </div>
+</div>
 
-  <!-- PROGRAMME D'ENTRAÎNEMENT -->
-  <section
-    class="bg-gradient-to-tr from-blue-50 via-blue-100 to-white rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-500 overflow-hidden group cursor-pointer">
-    <div class="flex flex-col md:flex-row items-center md:items-stretch">
-      <!-- Image -->
-      <div class="md:w-1/3 h-56 md:h-auto overflow-hidden relative rounded-l-3xl">
+<div class="max-w-5xl mx-auto px-6 py-10 space-y-8">
+
+  <!-- Programme Full Body -->
+  <div class="group bg-white rounded-2xl shadow-card hover:shadow-hover overflow-hidden
+              transition-all duration-300 hover:-translate-y-0.5">
+    <div class="flex flex-col md:flex-row items-stretch">
+      <div class="md:w-1/3 h-56 md:h-auto overflow-hidden bg-surface-muted">
         <img src="images/home/exercice.avif" alt="Programme Full Body"
-          class="w-full h-full object-cover object-center transform group-hover:scale-110 transition duration-700 ease-in-out" />
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
       </div>
-
-      <!-- Texte -->
-      <div class="md:w-2/3 p-8 flex flex-col justify-between bg-white rounded-r-3xl">
+      <div class="md:w-2/3 p-8 flex flex-col justify-between">
         <div>
-          <h2 class="text-3xl font-extrabold text-blue-700 group-hover:text-blue-800 transition-colors duration-300 mb-3">
-            Programme Full Body
-          </h2>
-          <p class="text-gray-700 leading-relaxed text-lg">
+          <span class="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3">
+            Entraînement
+          </span>
+          <h2 class="font-display text-2xl font-bold text-ink mb-3">Programme Full Body</h2>
+          <p class="text-ink/60 leading-relaxed">
             Entraînement complet sur 5 jours pour sculpter votre corps et améliorer votre force générale.
           </p>
         </div>
-
-        <!-- Badges -->
-        <div class="mt-6 flex flex-wrap gap-4 text-sm font-semibold text-blue-600">
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">💪 Prise
-            de masse</span>
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">🔥
-            5 jours</span>
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">🔰
-            Intermédiaire</span>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full bg-energy/10 text-energy text-xs font-semibold">💪 Prise de masse</span>
+          <span class="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">🔥 5 jours</span>
+          <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">🔰 Intermédiaire</span>
         </div>
-
-        <!-- CTA -->
-        <div class="mt-8 text-right">
+        <div class="mt-6 flex justify-end">
           <a routerLink="/exercises"
-            class="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 hover:shadow-xl transition duration-300">
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-surface
+                    font-bold text-sm hover:bg-primary-light transition-colors duration-200">
             Voir les exercices →
           </a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- PLAN ALIMENTAIRE -->
-  <section
-    class="bg-gradient-to-tr from-blue-50 via-blue-100 to-white rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-500 overflow-hidden group cursor-pointer">
-    <div class="flex flex-col md:flex-row items-center md:items-stretch">
-      <!-- Image -->
-      <div class="md:w-1/3 h-56 md:h-auto overflow-hidden relative rounded-l-3xl">
+  <!-- Plan Alimentaire -->
+  <div class="group bg-white rounded-2xl shadow-card hover:shadow-hover overflow-hidden
+              transition-all duration-300 hover:-translate-y-0.5">
+    <div class="flex flex-col md:flex-row items-stretch">
+      <div class="md:w-1/3 h-56 md:h-auto overflow-hidden bg-surface-muted">
         <img src="images/home/alimentation.avif" alt="Plan alimentaire"
-          class="w-full h-full object-cover object-center transform group-hover:scale-110 transition duration-700 ease-in-out" />
+             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
       </div>
-
-      <!-- Texte -->
-      <div class="md:w-2/3 p-8 flex flex-col justify-between bg-white rounded-r-3xl">
+      <div class="md:w-2/3 p-8 flex flex-col justify-between">
         <div>
-          <h2 class="text-3xl font-extrabold text-blue-700 group-hover:text-blue-800 transition-colors duration-300 mb-3">
-            Plan Alimentaire Équilibré
-          </h2>
-          <p class="text-gray-700 leading-relaxed text-lg">
-            Un programme nutritionnel conçu pour accompagner efficacement votre entraînement. Des repas sains,
-            variés et adaptés à vos objectifs.
+          <span class="inline-block px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold mb-3">
+            Nutrition
+          </span>
+          <h2 class="font-display text-2xl font-bold text-ink mb-3">Plan Alimentaire Équilibré</h2>
+          <p class="text-ink/60 leading-relaxed">
+            Un programme nutritionnel conçu pour accompagner efficacement votre entraînement.
+            Des repas sains, variés et adaptés à vos objectifs.
           </p>
         </div>
-
-        <!-- Badges -->
-        <div class="mt-6 flex flex-wrap gap-4 text-sm font-semibold text-blue-600">
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">🥗
-            Équilibré</span>
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">📅
-            7 jours</span>
-          <span
-            class="bg-blue-100 border border-blue-300 px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition">⚡
-            Performance</span>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">🥗 Équilibré</span>
+          <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">📅 7 jours</span>
+          <span class="px-3 py-1.5 rounded-full bg-energy/10 text-energy text-xs font-semibold">⚡ Performance</span>
         </div>
-
-        <!-- CTA -->
-        <div class="mt-8 text-right">
-          <a routerLink="/alimentation"
-            class="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-700 hover:shadow-xl transition duration-300">
-            Voir le plan alimentaire →
+        <div class="mt-6 flex justify-end">
+          <a routerLink="/tracker"
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-accent text-surface
+                    font-bold text-sm hover:bg-accent-dark transition-colors duration-200">
+            Tracker calorique →
           </a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
+  <!-- Tracker Calorique — nouveau -->
+  <div class="group bg-white rounded-2xl shadow-card hover:shadow-hover overflow-hidden
+              transition-all duration-300 hover:-translate-y-0.5 border-2 border-accent/20">
+    <div class="flex flex-col md:flex-row items-stretch">
+      <div class="md:w-1/3 h-56 md:h-auto overflow-hidden bg-primary flex items-center justify-center">
+        <span class="text-8xl">🥗</span>
+      </div>
+      <div class="md:w-2/3 p-8 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-block px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-semibold">
+              Nouveau
+            </span>
+            <span class="inline-block px-3 py-1 rounded-full bg-energy/10 text-energy text-xs font-semibold">
+              ⭐ Feature
+            </span>
+          </div>
+          <h2 class="font-display text-2xl font-bold text-ink mb-3">Tracker Calorique</h2>
+          <p class="text-ink/60 leading-relaxed">
+            Suis ton alimentation au quotidien. Recherche parmi des milliers d'aliments,
+            ajoute-les à ton journal et visualise tes macros en temps réel.
+          </p>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full bg-energy/10 text-energy text-xs font-semibold">⚡ Calories</span>
+          <span class="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">💪 Macros</span>
+          <span class="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-semibold">📊 Historique</span>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <a routerLink="/tracker"
+             class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-energy text-surface
+                    font-bold text-sm hover:bg-energy/90 transition-colors duration-200">
+            Ouvrir le tracker →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

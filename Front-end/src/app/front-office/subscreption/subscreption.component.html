@@ -1,1 +1,116 @@
-<p>subscreption works!</p>
+<!-- Header page -->
+<div class="bg-surface-muted border-b border-surface-muted">
+  <div class="max-w-5xl mx-auto px-6 py-10 text-center">
+    <span class="inline-block px-4 py-1.5 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-3">
+      Abonnements
+    </span>
+    <h1 class="font-display text-3xl md:text-4xl font-bold text-ink mb-3">
+      Choisis ton plan
+    </h1>
+    <p class="text-ink/50 text-base max-w-xl mx-auto">
+      Des formules simples, sans engagement, pour tous les niveaux.
+    </p>
+  </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-6 py-12">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-surface-muted border-t-accent animate-spin"></div>
+    <p class="text-ink/50 text-sm">Chargement...</p>
+  </div>
+
+  <!-- Plans statiques si pas de data back -->
+  <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Free -->
+    <div class="bg-white rounded-2xl shadow-card p-8 flex flex-col">
+      <div class="mb-6">
+        <span class="text-3xl">🌱</span>
+        <h3 class="font-display text-xl font-bold text-ink mt-2">Gratuit</h3>
+        <p class="text-ink/50 text-sm mt-1">Pour découvrir Eco-Fit</p>
+      </div>
+      <div class="mb-6">
+        <span class="font-display text-4xl font-bold text-ink">0€</span>
+        <span class="text-ink/40 text-sm">/mois</span>
+      </div>
+      <ul class="space-y-2 flex-grow mb-8">
+        <li *ngFor="let feature of freeFeatures" class="flex items-center gap-2 text-sm text-ink/70">
+          <svg class="h-4 w-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ feature }}
+        </li>
+      </ul>
+      <a routerLink="/signup"
+         class="w-full py-3 rounded-xl border-2 border-primary text-primary font-bold text-sm text-center
+                hover:bg-primary hover:text-surface transition-all duration-200">
+        Commencer gratuitement
+      </a>
+    </div>
+
+    <!-- Pro — mis en avant -->
+    <div class="bg-primary rounded-2xl shadow-hover p-8 flex flex-col relative">
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-energy text-surface text-xs font-bold">
+        Populaire
+      </span>
+      <div class="mb-6">
+        <span class="text-3xl">⚡</span>
+        <h3 class="font-display text-xl font-bold text-surface mt-2">Pro</h3>
+        <p class="text-surface/60 text-sm mt-1">Pour progresser sérieusement</p>
+      </div>
+      <div class="mb-6">
+        <span class="font-display text-4xl font-bold text-surface">9.99€</span>
+        <span class="text-surface/50 text-sm">/mois</span>
+      </div>
+      <ul class="space-y-2 flex-grow mb-8">
+        <li *ngFor="let feature of proFeatures" class="flex items-center gap-2 text-sm text-surface/80">
+          <svg class="h-4 w-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ feature }}
+        </li>
+      </ul>
+      <a routerLink="/signup"
+         class="w-full py-3 rounded-xl bg-energy text-surface font-bold text-sm text-center
+                hover:bg-energy/90 transition-all duration-200">
+        Choisir Pro
+      </a>
+    </div>
+
+    <!-- Elite -->
+    <div class="bg-white rounded-2xl shadow-card p-8 flex flex-col">
+      <div class="mb-6">
+        <span class="text-3xl">🏆</span>
+        <h3 class="font-display text-xl font-bold text-ink mt-2">Élite</h3>
+        <p class="text-ink/50 text-sm mt-1">Pour les plus ambitieux</p>
+      </div>
+      <div class="mb-6">
+        <span class="font-display text-4xl font-bold text-ink">19.99€</span>
+        <span class="text-ink/40 text-sm">/mois</span>
+      </div>
+      <ul class="space-y-2 flex-grow mb-8">
+        <li *ngFor="let feature of eliteFeatures" class="flex items-center gap-2 text-sm text-ink/70">
+          <svg class="h-4 w-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+          </svg>
+          {{ feature }}
+        </li>
+      </ul>
+      <a routerLink="/signup"
+         class="w-full py-3 rounded-xl border-2 border-primary text-primary font-bold text-sm text-center
+                hover:bg-primary hover:text-surface transition-all duration-200">
+        Choisir Élite
+      </a>
+    </div>
+  </div>
+
+  <!-- Éco-engagement -->
+  <div class="mt-12 bg-primary/5 rounded-2xl p-6 text-center">
+    <p class="text-ink/60 text-sm">
+      🌱 <strong class="text-primary">Eco-Fit s'engage</strong> — 1% de chaque abonnement est reversé
+      à des associations de reforestation.
+    </p>
+  </div>
+</div>
