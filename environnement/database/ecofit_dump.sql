@@ -223,7 +223,7 @@ CREATE TABLE `user` (
   `age` smallint DEFAULT NULL,
   `is_disabled` tinyint(1) DEFAULT NULL,
   `email` varchar(50) DEFAULT NULL,
-  `picture` varchar(50) DEFAULT NULL,
+  `picture` TEXT DEFAULT NULL,
   `disability_type` varchar(50) DEFAULT NULL,
   `id_programme` int DEFAULT NULL,
   `id_adventure` int DEFAULT NULL,

@@ -23,22 +23,22 @@ export const routes: Routes = [
     path: '',
     component: FrontOfficeComponent,
     children: [
-      { path: '', component: HomeComponent }, // page d'accueil
-      { path: 'categories', component: CategoriesComponent,  }, // page des catégories
-      { path: 'profil', component: ProfilComponent , }, // page de profil
-      { path: 'signup', component: SignupComponent },
-      { path: 'signin', component: SigninComponent },
+      { path: '', component: HomeComponent,canActivate: [AuthGuard] }, // page d'accueil
+      { path: 'categories', component: CategoriesComponent, canActivate: [AuthGuard] }, // page des catégories
+      { path: 'profil', component: ProfilComponent , canActivate: [AuthGuard] }, // page de profil
+      { path: 'signup', component: SignupComponent,  },
+      { path: 'signin', component: SigninComponent,  },
       { path: 'tracker', component: TrackerComponent, canActivate: [AuthGuard] },
-      { path: 'exercises', component: ExerciseComponent,  }, // page des exercices
-      { path: 'exercise/:id', component: ExerciseDetailComponent,  }, // page de détail d'un exercice
-      { path: 'alimentation', component: FoodListComponent,  }, // page de liste des aliments
-      { path: 'alimentation/:id', component: FoodDetailComponent, }, // page de détail d'un aliment
+      { path: 'exercises', component: ExerciseComponent,canActivate: [AuthGuard]  }, // page des exercices
+      { path: 'exercise/:id', component: ExerciseDetailComponent, canActivate: [AuthGuard] }, // page de détail d'un exercice
+      { path: 'alimentation', component: FoodListComponent, canActivate: [AuthGuard] }, // page de liste des aliments
+      { path: 'alimentation/:id', component: FoodDetailComponent, canActivate: [AuthGuard] }, // page de détail d'un aliment
       { path: 'about-us', component: AboutUsComponent }, // page "À propos de nous"
-      { path: 'event', component: EventListComponent,  },
-      { path: 'event/new', component: EventFormComponent,  },
-      { path: 'event/edit/:id', component: EventFormComponent,  },
-      { path: 'event/:id', component: EventDetailComponent,  },
-      { path: 'partner', component: PartnerComponent,  }, // page des partenaires
+      { path: 'event', component: EventListComponent, canActivate: [AuthGuard] },
+      { path: 'event/new', component: EventFormComponent, canActivate: [AuthGuard] },
+      { path: 'event/edit/:id', component: EventFormComponent, canActivate: [AuthGuard] },
+      { path: 'event/:id', component: EventDetailComponent, canActivate: [AuthGuard] },
+      { path: 'partner', component: PartnerComponent, canActivate: [AuthGuard] }, // page des partenaires
       { path: 'subscreption', component: SubscreptionComponent, canActivate: [AuthGuard] }, // page des abonnements
       {path: 'event/:id', component: EventDetailComponent, canActivate: [AuthGuard] }, // page de détail d'un événement
     ]

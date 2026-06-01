@@ -2,21 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ExerciseService } from '../../../services/exercise.service';
 import { IExercise } from '../../../models/IExercise';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 import { ISingleExerciseResponse } from '../../../models/ISingleExerciseResponse';
 
 @Component({
   selector: 'app-exercise-detail',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './exercise-detail.component.html',
   styleUrl: './exercise-detail.component.css'
 })
 export class ExerciseDetailComponent implements OnInit {
 
-  exerciseId!: number;
+  exerciseId!: string;
   exercise?: IExercise;
   loading: boolean = true;
   error: string | null = null;
@@ -27,21 +26,23 @@ export class ExerciseDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.exerciseId = Number(this.route.snapshot.paramMap.get('id'));
-    this.getExercise();
+    // L'ID est maintenant une string
+    this.exerciseId = this.route.snapshot.paramMap.get('id') || '';
+    if(this.exerciseId) {
+      this.getExercise();
+    }
   }
 
   getExercise(): void {
     this.exerciseService.getExerciseById(this.exerciseId).subscribe({
-      next: (response:ISingleExerciseResponse ) => {
+      next: (response: ISingleExerciseResponse) => {
         const data = response.data;
-        // sécuriser les tableaux
+        // Sécuriser les nouveaux tableaux
         data.images = data.images ?? [];
-        data.videos = data.videos ?? [];
-        data.muscles = data.muscles ?? [];
-        data.muscles_secondary = data.muscles_secondary ?? [];
-        data.equipment = data.equipment ?? [];
-
+        data.primaryMuscles = data.primaryMuscles ?? [];
+        data.secondaryMuscles = data.secondaryMuscles ?? [];
+        data.instructions = data.instructions ?? [];
+        
         this.exercise = data;
         this.loading = false;
         console.log('✅ Exercice chargé:', this.exercise);
@@ -53,5 +54,4 @@ export class ExerciseDetailComponent implements OnInit {
       }
     });
   }
-
 }

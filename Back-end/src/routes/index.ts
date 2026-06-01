@@ -8,6 +8,8 @@ import roleRoutes from './Role.route';
 import alimentationRoutes from './Alimentation.routes';
 import eventRoutes from './Event.route';
 import nutritionRoutes from './Nutrition.routes';
+import offRoutes from './Openfoodfacts.routes';
+
 const router = Router();
 
 router.use('/exercices', exerciceRoutes);
@@ -19,5 +21,5 @@ router.use('/roles', roleRoutes);
 router.use('/alimentation',alimentationRoutes);
 router.use('/events', eventRoutes);
 router.use('/nutrition', nutritionRoutes);
-
+router.use('/off', offRoutes);
 export default router;

@@ -1,91 +1,60 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { IAliment } from '../../models/IAlimentation';
-import { IAlimentResponse } from '../../models/IAlimentResponse';
-import { AlimentationService } from '../../services/alimentation.service';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { OpenFoodFactsService } from '../../services/open-food-facts.service';
+import { NormalizedFood } from '../../models/IOpenFoodFacts';
 import { SearchBarComponent } from '../../shared/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-food-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, SearchBarComponent],
+  imports: [CommonModule, SearchBarComponent],
   templateUrl: './food-list.component.html',
   styleUrl: './food-list.component.css'
 })
-export class FoodListComponent implements OnInit {
-  aliments: IAliment[] = [];
-  currentPage = 1;
-  pageSize = 20;
-  totalCount = 0;
-  totalPages = 0;
-  isLoading = true;
+export class FoodListComponent {
+  foods: NormalizedFood[] = [];
+  isLoading = false;
+  hasSearched = false;
+
+  private search$ = new Subject<string>();
 
   constructor(
-    private alimentService: AlimentationService,
+    private off: OpenFoodFactsService,
     private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.loadPage(1);
-  }
-
-  loadPage(page: number) {
-    this.isLoading = true;
-    this.currentPage = page;
-    const offset = (page - 1) * this.pageSize;
-
-    this.alimentService.getAliments(this.pageSize, offset).subscribe({
-      next: (response: IAlimentResponse) => {
-        if (response?.results && Array.isArray(response.results)) {
-          this.aliments = response.results;
-          this.totalCount = response.count;
-          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-        } else {
-          this.aliments = [];
-        }
+  ) {
+    this.search$.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(term => {
+        this.isLoading = true;
+        return this.off.search(term, 24);
+      })
+    ).subscribe({
+      next: results => {
+        this.foods     = results;
         this.isLoading = false;
-      },
-      error: () => {
-        this.aliments = [];
-        this.isLoading = false;
-      }
-    });
-  }
-
-  onSearch(term: string) {
-    if (!term) { this.loadPage(1); return; }
-    this.isLoading = true;
-    this.alimentService.getAliments(50, 0).subscribe({
-      next: (res) => {
-        const filtered = res.results.filter(a =>
-          a.name?.toLowerCase().includes(term.toLowerCase())
-        );
-        this.aliments = filtered;
-        this.totalCount = filtered.length;
-        this.totalPages = 1;
-        this.currentPage = 1;
-        this.isLoading = false;
+        this.hasSearched = true;
       },
       error: () => { this.isLoading = false; }
     });
   }
 
-  previousPage() { if (this.currentPage > 1) this.loadPage(this.currentPage - 1); }
-  nextPage() { if (this.currentPage < this.totalPages) this.loadPage(this.currentPage + 1); }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) this.loadPage(page);
+  onSearch(term: string): void {
+    if (!term.trim()) {
+      this.foods = [];
+      this.hasSearched = false;
+      return;
+    }
+    this.search$.next(term);
   }
 
-  getPageNumbers(): number[] {
-    const maxVisible = 5;
-    const start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
-    const end = Math.min(this.totalPages, start + maxVisible - 1);
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  goToDetail(food: NormalizedFood): void {
+    // On passe l'id OFF en paramètre — c'est un string (barcode)
+    this.router.navigate(['/alimentation', food.id]);
   }
 
-  navigateTo(route: string) { this.router.navigateByUrl(route); }
-
-  trackByFn(_: number, item: IAliment): number { return item.id; }
+  trackByFn(_: number, item: NormalizedFood): string { return item.id; }
 }

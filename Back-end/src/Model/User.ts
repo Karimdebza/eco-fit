@@ -52,7 +52,7 @@ export default (sequelize: Sequelize, DataTypes: typeof DT) => {
       age: { type: DataTypes.SMALLINT, allowNull: true },
       is_disabled: { type: DataTypes.BOOLEAN, allowNull: true },
       email: { type: DataTypes.STRING(50), allowNull: true },
-      picture: { type: DataTypes.STRING(50), allowNull: true },
+      picture: { type: DataTypes.TEXT, allowNull: true },
       token: { type: DataTypes.STRING(300), allowNull: true },
       disability_type: { type: DataTypes.STRING(50), allowNull: true },
       id_programme: { type: DataTypes.INTEGER, allowNull: true },

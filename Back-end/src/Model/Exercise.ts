@@ -3,19 +3,20 @@ import { Sequelize, DataTypes as DT, Model } from 'sequelize';
 export default (sequelize: Sequelize, DataTypes: typeof DT) => {
   class Exercise extends Model {
     declare id_exercise: number;
+    declare slug: string;           // ex: "Alternate_Incline_Dumbbell_Curl"
     declare name: string;
-    declare accessibility: string;
-    declare time_of_exercise: number;
-    declare needs_materials: boolean;
-    declare objectif_targeted: string;
-    declare url_video: string;
-    declare number_of_set: number;
-    declare nombre_of_rep: number;
-    declare description: string;
+    declare category: string;       // strength, cardio, stretching...
+    declare level: string;          // beginner, intermediate, expert
+    declare force: string | null;   // pull, push, static
+    declare mechanic: string | null;
+    declare equipment: string | null;
+    declare primary_muscles: string;   // JSON array stocké en TEXT
+    declare secondary_muscles: string; // JSON array stocké en TEXT
+    declare instructions: string;      // JSON array stocké en TEXT
+    declare images: string;            // JSON array stocké en TEXT
 
     static associate(models: any) {
-      // Many-to-many with Programme through ProgrammeExercise
-      Exercise.belongsToMany(models.Programme, { 
+      Exercise.belongsToMany(models.Programme, {
         through: models.ProgrammeExercise,
         foreignKey: 'id_exercise',
         otherKey: 'id_programme'
@@ -24,21 +25,23 @@ export default (sequelize: Sequelize, DataTypes: typeof DT) => {
   }
 
   Exercise.init({
-    id_exercise: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: false },
-    name: { type: DataTypes.STRING(50), allowNull: true },
-    accessibility: { type: DataTypes.STRING(50), allowNull: true },
-    time_of_exercise: { type: DataTypes.INTEGER, allowNull: true },
-    needs_materials: { type: DataTypes.BOOLEAN, allowNull: true },
-    objectif_targeted: { type: DataTypes.STRING(50), allowNull: true },
-    url_video: { type: DataTypes.STRING(200), allowNull: true },
-    number_of_set: { type: DataTypes.INTEGER, allowNull: true },
-    nombre_of_rep: { type: DataTypes.INTEGER, allowNull: true },
-    description: { type: DataTypes.TEXT, allowNull: true }
+    id_exercise:       { type: DataTypes.INTEGER,      primaryKey: true, autoIncrement: true },
+    slug:              { type: DataTypes.STRING(200),  allowNull: false, unique: true },
+    name:              { type: DataTypes.STRING(200),  allowNull: false },
+    category:          { type: DataTypes.STRING(50),   allowNull: true },
+    level:             { type: DataTypes.STRING(20),   allowNull: true },
+    force:             { type: DataTypes.STRING(20),   allowNull: true },
+    mechanic:          { type: DataTypes.STRING(30),   allowNull: true },
+    equipment:         { type: DataTypes.STRING(50),   allowNull: true },
+    primary_muscles:   { type: DataTypes.TEXT,         allowNull: true },
+    secondary_muscles: { type: DataTypes.TEXT,         allowNull: true },
+    instructions:      { type: DataTypes.TEXT('long'), allowNull: true },
+    images:            { type: DataTypes.TEXT,         allowNull: true },
   }, {
     sequelize,
     modelName: 'Exercise',
     tableName: 'exercise',
-    timestamps: false
+    timestamps: false,
   });
 
   return Exercise;

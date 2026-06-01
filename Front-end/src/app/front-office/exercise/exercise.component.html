@@ -1,11 +1,7 @@
-<!-- Header page -->
-<div class="bg-surface-muted border-b border-surface-muted">
-  <div class="max-w-7xl mx-auto px-6 py-10">
-    <div class="flex items-center gap-3 mb-2">
-      <span class="text-3xl">🏋️</span>
-      <h1 class="font-display text-3xl font-bold text-ink">Exercices</h1>
-    </div>
-    <p class="text-ink/50 text-sm mb-6">Explore notre bibliothèque d'exercices guidés.</p>
+<div class="bg-primary">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+    <h1 class="font-display text-4xl font-bold text-surface mb-2">Exercices</h1>
+    <p class="text-surface/60 text-sm mb-8">Explore notre bibliothèque d'exercices guidés.</p>
     <app-search-bar
       placeholder="Rechercher un exercice..."
       (searchEvent)="onSearch($event)"
@@ -13,96 +9,89 @@
   </div>
 </div>
 
-<div class="max-w-7xl mx-auto px-6 py-8">
+<div class="max-w-7xl mx-auto px-6 py-10">
 
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 gap-4">
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-24 gap-4">
     <div class="w-10 h-10 rounded-full border-4 border-surface-muted border-t-accent animate-spin"></div>
-    <p class="text-ink/50 text-sm">Chargement des exercices...</p>
+    <p class="text-ink-muted text-sm">Chargement des exercices...</p>
   </div>
 
-  <!-- Stats -->
-  <div *ngIf="!isLoading && totalCount > 0" class="flex items-center justify-between mb-6">
-    <p class="text-ink/50 text-sm">
-      <span class="font-semibold text-ink">{{ totalCount | number }}</span> exercices —
-      page <span class="font-semibold text-ink">{{ currentPage }}</span> sur {{ totalPages | number }}
-    </p>
-  </div>
-
-  <!-- Empty state -->
-  <div *ngIf="!isLoading && exercises.length === 0" class="text-center py-20">
+  <div *ngIf="!isLoading && (!exercises || exercises.length === 0)" class="text-center py-24">
     <div class="text-6xl mb-4">🏃</div>
     <p class="font-display text-xl font-bold text-ink mb-2">Aucun exercice trouvé</p>
-    <p class="text-ink/50 text-sm">Essaie un autre terme de recherche.</p>
+    <p class="text-ink-muted text-sm">Essaie un autre terme de recherche.</p>
   </div>
 
-  <!-- Liste -->
-  <div *ngIf="!isLoading && exercises.length > 0" class="space-y-4">
-    <div
-      *ngFor="let exo of exercises; trackBy: trackByFn"
-      [routerLink]="['/exercise', exo.id]"
-      class="group bg-white rounded-2xl shadow-card hover:shadow-hover cursor-pointer
-             transition-all duration-300 hover:-translate-y-0.5 overflow-hidden
-             flex items-stretch focus:outline-none focus:ring-2 focus:ring-accent"
-      tabindex="0"
-      role="button"
-    >
-      <!-- Image -->
-      <div class="flex-shrink-0 w-36 h-32 bg-surface-muted overflow-hidden">
+  <p *ngIf="!isLoading && exercises && exercises.length > 0" class="text-ink-muted text-sm mb-6">
+    <span class="font-semibold text-ink">{{ totalCount | number }}</span> exercices —
+    page <span class="font-semibold text-ink">{{ currentPage }}</span> / {{ totalPages }}
+  </p>
+
+  <div *ngIf="!isLoading && exercises && exercises.length > 0"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
+    <a *ngFor="let exo of exercises"
+       [routerLink]="['/exercise', exo?.id]"
+       class="group bg-white rounded-2xl shadow-card hover:shadow-hover overflow-hidden
+              transition-all duration-300 hover:-translate-y-1 flex flex-col">
+
+      <div class="relative h-44 bg-surface-muted overflow-hidden flex-shrink-0">
         <img
-          *ngIf="exo.images && exo.images.length > 0; else noExoImg"
+          *ngIf="exo?.images && exo.images.length > 0 && exo.images[0]?.url"
           [src]="exo.images[0].url"
-          [alt]="exo.name"
+          [alt]="exo?.name || 'Exercice'"
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
-        <ng-template #noExoImg>
-          <div class="w-full h-full flex flex-col items-center justify-center gap-1">
-            <span class="text-3xl">🏋️</span>
-            <span class="text-ink/30 text-xs">Pas d'image</span>
-          </div>
-        </ng-template>
+        <div *ngIf="!exo?.images || exo.images.length === 0 || !exo.images[0]?.url"
+             class="w-full h-full flex items-center justify-center">
+          <span class="text-5xl opacity-30">🏋️</span>
+        </div>
+
+        <span *ngIf="exo?.category"
+              class="absolute top-3 left-3 px-2.5 py-1 rounded-full
+                     bg-primary/80 backdrop-blur-sm text-surface text-xs font-semibold uppercase">
+          {{ exo.category }}
+        </span>
       </div>
 
-      <!-- Contenu -->
-      <div class="flex flex-col flex-grow p-5">
-        <div class="flex items-start justify-between gap-4 mb-2">
-          <h2 class="font-display font-bold text-ink text-lg leading-tight">
-            {{ exo.name || 'Nom non disponible' }}
-          </h2>
-          <span class="flex-shrink-0 text-xs text-ink/30 bg-surface-muted px-2 py-1 rounded-lg">
-            #{{ exo.id }}
+      <div class="flex flex-col flex-grow p-4 gap-2">
+
+        <h2 class="font-display font-bold text-ink text-base leading-snug line-clamp-2">
+          {{ exo?.name || 'Sans nom' }}
+        </h2>
+
+        <p class="text-ink-muted text-xs line-clamp-2 leading-relaxed flex-grow">
+          {{ exo?.instructions && exo.instructions.length > 0 ? exo.instructions.join(' ') : 'Pas d\'instructions disponibles' }}
+        </p>
+
+        <div *ngIf="exo?.primaryMuscles && exo.primaryMuscles.length > 0" class="flex flex-wrap gap-1 mt-1">
+          <span *ngFor="let m of exo.primaryMuscles?.slice(0, 3)"
+                class="px-2 py-0.5 rounded-md bg-accent/10 text-accent text-xs font-medium capitalize">
+            💪 {{ m }}
           </span>
         </div>
 
-        <div class="text-ink/60 text-sm line-clamp-2 mb-3 leading-relaxed"
-             [innerHTML]="exo.description || 'Pas de description disponible'">
-        </div>
-
-        <div class="flex items-center justify-between mt-auto">
-          <div class="flex gap-2">
-        <span *ngIf="exo.category"
-              class="px-2.5 py-1 rounded-lg bg-primary/10 text-primary text-xs font-semibold">
-          Catégorie {{ exo.category }}
-        </span>
-          </div>
+        <div class="flex items-center justify-between mt-2 pt-3 border-t border-surface-muted">
+          <span class="text-ink-muted text-xs">#{{ (exo?.id?.toString() || '') | slice:0:8 }}</span>
           <span class="text-accent text-xs font-semibold flex items-center gap-1
-                       opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            Voir l'exercice
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            Voir
             <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
             </svg>
           </span>
         </div>
+
       </div>
-    </div>
+    </a>
+
   </div>
 
-  <!-- Pagination -->
   <nav *ngIf="!isLoading && totalPages > 1"
-       class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-    <button
-      (click)="previousPage()" [disabled]="currentPage === 1"
+       class="mt-12 flex items-center justify-center gap-2">
+
+    <button (click)="previousPage()" [disabled]="currentPage === 1"
       class="px-4 py-2 rounded-xl border border-surface-muted text-sm font-semibold text-ink
              hover:bg-surface-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
       ← Précédent
@@ -110,32 +99,35 @@
 
     <div class="flex items-center gap-1">
       <button *ngIf="getPageNumbers()[0] > 1" (click)="goToPage(1)"
-              class="w-9 h-9 rounded-xl border border-surface-muted text-sm text-ink hover:bg-surface-muted transition-colors">1</button>
-      <span *ngIf="getPageNumbers()[0] > 2" class="px-1 text-ink/30 text-sm">…</span>
+        class="w-9 h-9 rounded-xl border border-surface-muted text-sm text-ink hover:bg-surface-muted transition-colors">
+        1
+      </button>
+      <span *ngIf="getPageNumbers()[0] > 2" class="px-1 text-ink-muted text-sm">…</span>
 
       <button *ngFor="let page of getPageNumbers()" (click)="goToPage(page)"
-              class="w-9 h-9 rounded-xl border text-sm font-medium transition-colors"
-              [ngClass]="{
-                'bg-primary border-primary text-surface': page === currentPage,
-                'border-surface-muted text-ink hover:bg-surface-muted': page !== currentPage
-              }">
+        class="w-9 h-9 rounded-xl border text-sm font-medium transition-colors"
+        [ngClass]="{
+          'bg-primary border-primary text-surface': page === currentPage,
+          'border-surface-muted text-ink hover:bg-surface-muted': page !== currentPage
+        }">
         {{ page }}
       </button>
 
       <span *ngIf="getPageNumbers()[getPageNumbers().length-1] < totalPages - 1"
-            class="px-1 text-ink/30 text-sm">…</span>
-      <button *ngIf="getPageNumbers()[getPageNumbers().length-1] < totalPages" (click)="goToPage(totalPages)"
-              class="w-9 h-9 rounded-xl border border-surface-muted text-sm text-ink hover:bg-surface-muted transition-colors">
+            class="px-1 text-ink-muted text-sm">…</span>
+      <button *ngIf="getPageNumbers()[getPageNumbers().length-1] < totalPages"
+              (click)="goToPage(totalPages)"
+        class="w-9 h-9 rounded-xl border border-surface-muted text-sm text-ink hover:bg-surface-muted transition-colors">
         {{ totalPages }}
       </button>
     </div>
 
-    <button
-      (click)="nextPage()" [disabled]="currentPage >= totalPages"
+    <button (click)="nextPage()" [disabled]="currentPage >= totalPages"
       class="px-4 py-2 rounded-xl border border-surface-muted text-sm font-semibold text-ink
              hover:bg-surface-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
       Suivant →
     </button>
+
   </nav>
 
 </div>
